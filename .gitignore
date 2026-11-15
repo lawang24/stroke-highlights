@@ -1,0 +1,13 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+inputs/
+outputs/
+*.pt
+*.mp4
+*.mov
+*.MOV
+*.mkv
+*.webm
