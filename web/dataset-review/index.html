@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Approve the labels · Stroke Highlights</title><link rel="stylesheet" href="/review.css"></head>
+<body>
+<header><div><span class="eyebrow">STROKE HIGHLIGHTS / DATASET REVIEW</span><h1>Watch the clip. Check the label.</h1><p>Current Tennis RNN suggests a label for the <strong>near-court player</strong>. Approve it or choose a correction.</p></div><span class="pill">LOCAL · DRAFT</span></header>
+<main>
+<aside><div class="list-heading"><h2>Shuffled clips</h2><span id="progress">Loading…</span></div><div id="clips"></div><p class="muted">Your decisions save automatically. No contact times needed.</p></aside>
+<section class="workspace">
+<div class="player-panel"><div class="clip-heading"><div><span class="eyebrow" id="position">CLIP</span><h2 id="title">Ready to review</h2></div><span id="duration" class="muted"></span></div>
+<video id="video" controls playsinline preload="auto"></video>
+<div class="transport"><button id="replay" aria-keyshortcuts="R">↺ Replay <kbd>R</kbd></button><label>Speed <select id="speed"><option value=".5">0.5×</option><option value="1" selected>1×</option></select></label></div><p class="muted shortcuts"><kbd>P</kbd> Play / pause · <kbd>R</kbd> Replay</p></div>
+<div class="annotation">
+<span class="eyebrow">TENNIS RNN SUGGESTS</span><h2 id="suggestion">Loading…</h2><p id="reason" class="muted"></p>
+<div id="decision-buttons"><button class="primary" id="approve" aria-keyshortcuts="A">Approve & next <kbd>A</kbd></button><button id="deny" aria-keyshortcuts="D">Deny / change label <kbd>D</kbd></button></div>
+<div id="correction" hidden><h3>What is it?</h3><div id="labels" class="actions"><button data-label="forehand" aria-keyshortcuts="1">Forehand <kbd>1</kbd></button><button data-label="backhand" aria-keyshortcuts="2">Backhand <kbd>2</kbd></button><button data-label="no_shot" aria-keyshortcuts="3">No shot <kbd>3</kbd></button><button data-label="unsure" aria-keyshortcuts="4">Unsure <kbd>4</kbd></button></div></div>
+<p class="muted guidance">Choose Unsure for mixed forehands/backhands, serves, or anything unclear.</p>
+<p id="your-label"></p><p id="save-status" role="status">Awaiting your review</p><div id="error" role="alert" hidden></div>
+<div class="review-nav"><button id="previous">← Previous</button><button id="next">Skip / next →</button></div></div>
+<footer><div><h3>Freeze after reviewing</h3><p class="muted">Freezing saves your approved labels as the benchmark. Unsure and No shot count as negative in the current evaluation; all positive strokes must be retained. Detection times are not checked.</p></div><div class="actions"><button id="download">Download review</button><button id="freeze" disabled>Freeze reviewed dataset</button></div><p id="freeze-status" role="status"></p></footer>
+</section></main><script type="module" src="/review.js"></script>
+</body></html>

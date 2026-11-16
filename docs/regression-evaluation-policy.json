@@ -1,0 +1,47 @@
+{
+  "id": "forehand-backhand-positives-v1",
+  "status": "current user-requested evaluation policy",
+  "unit": "clip",
+  "player": "near",
+  "positive_labels": [
+    "forehand",
+    "backhand"
+  ],
+  "negative_label": "no_shot",
+  "truth_aliases": {
+    "unsure": "no_shot",
+    "no_shot": "no_shot"
+  },
+  "include_human_unsure": true,
+  "prediction_rule": "Only emitted forehand/backhand events count as positives. No positive events is negative, including zero classified windows. Mixed positives retain both classes and must never collapse to negative.",
+  "primary_metrics": [
+    "per_class_positive_recall",
+    "per_class_false_negatives",
+    "any_stroke_recall",
+    "missed_positive_clip_ids"
+  ],
+  "acceptance": {
+    "forehand_false_negatives": 0,
+    "backhand_false_negatives": 0,
+    "missing_or_failed_runs": "fail, never convert inference errors or omitted clips to negative"
+  },
+  "secondary_metrics": [
+    "positive_precision",
+    "false_positives",
+    "confusion_matrix",
+    "clip_label_agreement"
+  ],
+  "diagnostics": [
+    "classified_windows",
+    "tracking_failures",
+    "mixed_positive_events"
+  ],
+  "check_detection_times": false,
+  "check_contact_times": false,
+  "preserve_raw_labels": true,
+  "legacy_snapshot_override": "This policy supersedes the embedded unsure-exclusion evaluation metadata in frozen v2 snapshots. It does not rewrite annotations, included flags, source intervals or frozen bytes.",
+  "split_grouping": "source recording, never independently split overlapping clips",
+  "representativeness": "starter corpus; not a general accuracy benchmark",
+  "implementation": "scripts/regression-metrics.mjs",
+  "tests": "tests/regression-metrics.test.js"
+}
