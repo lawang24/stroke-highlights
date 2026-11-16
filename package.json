@@ -1,0 +1,25 @@
+{
+  "name": "stroke-highlights-browser",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "node scripts/prepare-browser.mjs",
+    "dev": "vite --host 127.0.0.1",
+    "build": "npm run setup && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test tests/*.test.js",
+    "predev": "npm run setup"
+  },
+  "dependencies": {
+    "@ffmpeg/core": "0.12.10",
+    "@ffmpeg/ffmpeg": "0.12.15",
+    "@tensorflow/tfjs-backend-cpu": "4.9.0",
+    "@tensorflow/tfjs-core": "4.9.0",
+    "@tensorflow/tfjs-tflite": "0.0.1-alpha.10"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.12",
+    "vite": "^6.4.1"
+  }
+}

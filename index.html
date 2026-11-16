@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Review tennis shots and create video compilations locally in your browser." />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; worker-src 'self' blob:; connect-src 'self' ws://127.0.0.1:* ws://localhost:*; object-src 'none'; base-uri 'self'; form-action 'none'" />
+  <title>Stroke Highlights</title>
+  <link rel="stylesheet" href="/web/style.css" />
+</head>
+<body>
+  <main>
+    <h1>Stroke Highlights</h1>
+    <section aria-labelledby="session-title">
+      <h2 id="session-title">Video</h2>
+      <div class="session-grid">
+        <div class="video-column">
+          <label id="drop-zone" class="drop-zone" for="file-input">
+            <span><span class="text-link">Choose a video</span> or drop it here</span>
+            <span class="muted">MP4, MOV, WebM · up to 500 MB</span>
+          </label>
+          <input id="file-input" type="file" accept="video/*,.mov,.mkv" class="visually-hidden" aria-label="Choose a tennis video" />
+          <div id="source-panel" hidden>
+            <video id="source-video" controls playsinline preload="metadata"></video>
+            <div class="video-caption">
+              <div><strong id="file-name"></strong><span id="file-meta" class="muted"></span></div>
+              <button id="replace-video">Change video</button>
+            </div>
+          </div>
+          <p class="hint">Video processing stays in this browser.</p>
+        </div>
+        <form id="settings" class="settings">
+          <p class="hint"><strong>Tennis RNN</strong> · Near-court player</p>
+          <label for="handedness">Playing hand</label>
+          <select id="handedness"><option value="right">Right-handed</option><option value="left">Left-handed</option></select>
+          <div class="timing-fields">
+            <label>Before shot (s)<input id="before" type="number" min="0" max="10" step="0.1" value="1.2" required /></label>
+            <label>After shot (s)<input id="after" type="number" min="0.1" max="10" step="0.1" value="0.9" required /></label>
+          </div>
+          <label class="checkbox-label"><input id="mirrored" type="checkbox" /> Mirrored video</label>
+          <button id="analyze" class="primary" type="submit" disabled>Detect shots</button>
+          <p class="hint">Use a fixed camera behind the baseline, with the player fully visible.</p>
+        </form>
+      </div>
+      <div id="status-panel" class="status-panel" hidden>
+        <div class="status-top"><span id="status-text" role="status" aria-live="polite"></span><button id="cancel" hidden>Cancel</button></div>
+        <progress id="progress" max="100" value="0" aria-label="Processing progress"></progress>
+      </div>
+      <p id="error" class="error" role="alert" hidden></p>
+    </section>
+    <section id="review-section" hidden>
+      <div class="section-heading">
+        <h2>Shots</h2>
+        <div class="review-actions">
+          <button id="save-review">Save shot list</button>
+          <button id="load-review">Load shot list</button>
+          <input id="review-file" type="file" accept="application/json,.json" hidden />
+          <button id="add-shot">Add at playhead</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Keep</th><th scope="col">Play</th><th scope="col">Start (s)</th><th scope="col">End (s)</th><th scope="col">Category</th><th scope="col">Note</th><th scope="col"><span class="visually-hidden">Remove</span></th></tr></thead>
+          <tbody id="shot-rows"></tbody>
+        </table>
+        <p id="no-shots" class="no-shots" hidden>No shots. Run detection or add a shot at the playhead.</p>
+      </div>
+    </section>
+    <section id="results" aria-labelledby="results-title">
+      <div class="section-heading"><h2 id="results-title">Compilations</h2><button id="compile-all" disabled title="Create separate forehand and backhand videos from included shots">Compile both</button></div>
+      <div class="compilation-grid">
+        <article class="compilation-card" data-stroke="forehand">
+          <div class="card-top"><h3>Forehands</h3><span class="muted" id="forehand-count">0 shots</span></div>
+          <div class="compilation-media"><video id="forehand-video" controls playsinline preload="metadata" hidden></video><div id="forehand-empty" class="empty-state"><p>No video selected.</p></div></div>
+          <div class="card-footer"><span id="forehand-duration" class="muted"></span><button id="compile-forehand" disabled>Compile</button><a id="download-forehand" hidden download="forehands.mp4">Download MP4</a></div>
+        </article>
+        <article class="compilation-card" data-stroke="backhand">
+          <div class="card-top"><h3>Backhands</h3><span class="muted" id="backhand-count">0 shots</span></div>
+          <div class="compilation-media"><video id="backhand-video" controls playsinline preload="metadata" hidden></video><div id="backhand-empty" class="empty-state"><p>No video selected.</p></div></div>
+          <div class="card-footer"><span id="backhand-duration" class="muted"></span><button id="compile-backhand" disabled>Compile</button><a id="download-backhand" hidden download="backhands.mp4">Download MP4</a></div>
+        </article>
+      </div>
+      <p class="hint">Detection is experimental. Review shots before exporting. Only forehands and backhands are supported.</p>
+    </section>
+  </main>
+  <script type="module" src="/web/main.js"></script>
+</body>
+</html>
