@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "classifier": "tennis-rnn",
+  "settings": {
+    "stroke": "both",
+    "classifier": "tennis-rnn",
+    "compare_models": [
+      "heuristic",
+      "adaspot"
+    ],
+    "tennis_rnn_threshold": 0.98,
+    "tennis_rnn_min_gap": 2.0,
+    "adaspot_threshold": 0.3,
+    "adaspot_min_gap": 0.5,
+    "compare_tolerance": 0.5,
+    "events_csv": null,
+    "player": "near",
+    "handedness": "right",
+    "mirrored": false,
+    "roi": null,
+    "model": "yolo26s-pose.pt",
+    "device": "auto",
+    "imgsz": 960,
+    "sample_fps": 15,
+    "before": 1.2,
+    "after": 0.9,
+    "min_speed": 2.8,
+    "min_gap": 1.8,
+    "min_player_height": 0.2,
+    "limit": null
+  },
+  "source": {
+    "name": "adaspot-comparison-input.mp4",
+    "size": 41602524,
+    "lastModified": 1794776340758,
+    "duration": 35.166666666666664
+  },
+  "events": [
+    {
+      "id": 1,
+      "time": 7.017,
+      "start": 5.817,
+      "end": 7.917,
+      "stroke": "backhand",
+      "score": 0.9813,
+      "include": true,
+      "reason": "Tennis RNN: backhand; 30-frame MoveNet sequence"
+    },
+    {
+      "id": 2,
+      "time": 10.65,
+      "start": 9.45,
+      "end": 11.55,
+      "stroke": "forehand",
+      "score": 0.9994,
+      "include": true,
+      "reason": "Tennis RNN: forehand; 30-frame MoveNet sequence"
+    },
+    {
+      "id": 3,
+      "time": 23.65,
+      "start": 22.45,
+      "end": 24.55,
+      "stroke": "forehand",
+      "score": 0.9932,
+      "include": true,
+      "reason": "Tennis RNN: forehand; 30-frame MoveNet sequence"
+    },
+    {
+      "id": 4,
+      "time": 27.817,
+      "start": 26.617,
+      "end": 28.717,
+      "stroke": "backhand",
+      "score": 0.9881,
+      "include": true,
+      "reason": "Tennis RNN: backhand; 30-frame MoveNet sequence"
+    },
+    {
+      "id": 5,
+      "time": 31.017,
+      "start": 29.817,
+      "end": 31.917,
+      "stroke": "forehand",
+      "score": 0.9992,
+      "include": true,
+      "reason": "Tennis RNN: forehand; 30-frame MoveNet sequence"
+    }
+  ]
+}

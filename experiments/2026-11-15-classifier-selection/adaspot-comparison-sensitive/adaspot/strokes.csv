@@ -1,0 +1,4 @@
+id,time,start,end,stroke,score,include,reason
+1,0.3,0,1.2,forehand,0.094,True,"AdaSpot: near stroke, forehand, groundstroke; hand score 0.939"
+2,10.667,9.467,11.567,forehand,0.09,True,"AdaSpot: near stroke, forehand, groundstroke; hand score 0.807"
+3,30.133,28.933,31.033,backhand,0.055,True,"AdaSpot: near stroke, backhand, slice; hand score 0.879"

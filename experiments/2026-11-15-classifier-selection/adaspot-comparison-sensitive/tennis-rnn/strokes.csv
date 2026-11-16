@@ -1,0 +1,6 @@
+id,time,start,end,stroke,score,include,reason
+1,7.017,5.817,7.917,backhand,0.9813,True,Tennis RNN: backhand; 30-frame MoveNet sequence
+2,10.65,9.45,11.55,forehand,0.9994,True,Tennis RNN: forehand; 30-frame MoveNet sequence
+3,23.65,22.45,24.55,forehand,0.9932,True,Tennis RNN: forehand; 30-frame MoveNet sequence
+4,27.817,26.617,28.717,backhand,0.9881,True,Tennis RNN: backhand; 30-frame MoveNet sequence
+5,31.017,29.817,31.917,forehand,0.9992,True,Tennis RNN: forehand; 30-frame MoveNet sequence

@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-15",
+  "purpose": "Default-only browser integration smoke test, not an accuracy benchmark",
+  "source": "adaspot-comparison-input.mp4",
+  "threshold": 0.98,
+  "min_gap_seconds": 2.0,
+  "events": [
+    {
+      "time": 7.05,
+      "stroke": "backhand"
+    },
+    {
+      "time": 10.65,
+      "stroke": "forehand"
+    },
+    {
+      "time": 23.683,
+      "stroke": "forehand"
+    },
+    {
+      "time": 27.75,
+      "stroke": "backhand"
+    },
+    {
+      "time": 30.983,
+      "stroke": "forehand"
+    }
+  ],
+  "comparison_to_python": {
+    "same_labels": 5,
+    "max_time_offset_seconds": 0.067
+  }
+}

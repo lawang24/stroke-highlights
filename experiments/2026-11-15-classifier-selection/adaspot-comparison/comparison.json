@@ -1,0 +1,15 @@
+{
+  "note": "Agreement between proposals is not accuracy; review against the source video.",
+  "tolerance_seconds": 0.5,
+  "heuristic": {
+    "backhand": 3,
+    "unknown": 2,
+    "forehand": 2
+  },
+  "adaspot": {},
+  "matched": 0,
+  "same_label": 0,
+  "different_label": 0,
+  "heuristic_only": 7,
+  "adaspot_only": 0
+}

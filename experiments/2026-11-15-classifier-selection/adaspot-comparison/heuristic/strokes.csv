@@ -1,0 +1,8 @@
+id,time,start,end,stroke,score,include,reason
+1,7.267,6.067,8.167,backhand,0.766,True,opposite-side preparation and outward swing
+2,10.533,9.333,11.433,backhand,0.722,True,opposite-side preparation and outward swing
+3,18.067,16.867,18.967,unknown,0.0,False,ambiguous preparation or swing direction
+4,23.467,22.267,24.367,forehand,0.85,True,dominant-side preparation and cross-body swing
+5,27.933,26.733,28.833,backhand,0.685,True,opposite-side preparation and outward swing
+6,31.067,29.867,31.967,forehand,0.681,True,dominant-side preparation and cross-body swing
+7,34.733,33.533,35.167,unknown,0.0,False,ambiguous preparation or swing direction

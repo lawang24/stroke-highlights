@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stroke Studio · Archived experiment</title>
+  <link rel="stylesheet" href="/review.css">
+  <script type="module" src="/review.js"></script>
+</head>
+<body>
+  <header><a class="brand" href="/">↗ Stroke <span>Studio</span></a><span class="local">● Archived experiment · local review</span></header>
+  <main>
+    <div class="heading"><div><p class="eyebrow">CLASSIFIER COMPARISON</p><h1>Watch the shot. Make the call.</h1><p class="intro">Click a moment, replay the swing, then choose what actually happened. Model predictions need your review.</p><p class="intro" id="model-summary"></p></div><button id="download" class="primary" disabled>Download my review ↓</button></div>
+    <p id="error" role="alert" hidden></p>
+    <div class="layout">
+      <section class="viewer" aria-label="Video and review controls">
+        <video id="video" controls preload="metadata" playsinline src="/video"></video>
+        <div class="video-toolbar"><span id="clock">0:00.00</span><div><button id="back-frame" aria-label="Back 0.1 seconds">−0.1 s</button><button id="forward-frame" aria-label="Forward 0.1 seconds">+0.1 s</button><label>Speed <select id="speed"><option value="0.25">0.25×</option><option value="0.5" selected>0.5×</option><option value="1">1×</option></select></label></div></div>
+        <div class="callout"><div class="callout-top"><p class="eyebrow" id="moment-label">SELECT A MOMENT</p><span id="moment-status"></span></div><h2 id="moment-title">Loading comparison…</h2>
+          <div class="prediction-grid" id="predictions"></div>
+          <div class="play-controls"><button id="previous">← Previous</button><button class="primary" id="replay">↻ Replay this moment</button><button id="next">Next →</button><label class="loop"><input type="checkbox" id="loop"> Loop</label></div>
+          <fieldset><legend>What actually happened?</legend><div id="verdicts"><button data-verdict="forehand">Forehand</button><button data-verdict="backhand">Backhand</button><button data-verdict="serve_overhead">Serve / overhead</button><button data-verdict="no_shot">No shot</button><button data-verdict="unsure">Unsure</button></div></fieldset>
+          <button id="clear-call" disabled>Clear call</button>
+          <p class="hint">Review the <strong id="player">near</strong> player. “No shot” means a false detection; “Unsure” keeps it unresolved.</p>
+          <label class="note-label" for="note">Your note <span>(optional)</span></label><input id="note" type="text" placeholder="e.g. recovery movement, not a stroke" maxlength="500">
+          <p id="save-status" class="save-status" aria-live="polite"></p>
+        </div>
+        <div class="missed"><div><strong>Did every model miss a shot?</strong><p>Play the full video and pause at contact, then add it here.</p></div><button id="add">+ Add at playhead</button></div>
+        <details><summary>About this comparison</summary><p id="run-details"></p><p>Scores use different scales and aren’t comparable. The list includes unknown predictions. Matched proposals are within 0.5 seconds unless configured otherwise. Review the whole video to find shots all models missed.</p><p>Your calls stay in this browser on this computer. Download your review to keep a portable copy.</p></details>
+      </section>
+      <aside><div class="list-header"><h2>Moments to review</h2><span id="progress">Loading…</span></div><div class="filters"><label for="filter" class="visually-hidden">Filter moments</label><select id="filter"><option value="all">All moments</option><option value="unreviewed">Not reviewed</option><option value="different_label">Label disagreements</option></select><button id="first-disagreement">Show disagreement</button></div><div id="moments" aria-label="Detected moments"></div><p id="empty" hidden>No moments in this filter.</p><p class="list-note">Click any row to play its excerpt. The model labels remain visible beside your own call. Reload this page to pick up a newly added candidate; your calls and notes are kept.</p></aside>
+    </div>
+  </main>
+</body>
+</html>

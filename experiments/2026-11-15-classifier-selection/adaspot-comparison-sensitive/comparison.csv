@@ -1,0 +1,10 @@
+status,heuristic_time,heuristic_stroke,adaspot_time,adaspot_stroke,offset_seconds
+adaspot_only,,,0.3,forehand,
+heuristic_only,7.267,backhand,,,
+different_label,10.533,backhand,10.667,forehand,0.134
+heuristic_only,18.067,unknown,,,
+heuristic_only,23.467,forehand,,,
+heuristic_only,27.933,backhand,,,
+adaspot_only,,,30.133,backhand,
+heuristic_only,31.067,forehand,,,
+heuristic_only,34.733,unknown,,,

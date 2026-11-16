@@ -1,0 +1,8 @@
+status,heuristic_time,heuristic_stroke,tennis-rnn_time,tennis-rnn_stroke,offset_seconds
+agree,7.267,backhand,7.017,backhand,-0.25
+different_label,10.533,backhand,10.65,forehand,0.117
+heuristic_only,18.067,unknown,,,
+agree,23.467,forehand,23.65,forehand,0.183
+agree,27.933,backhand,27.817,backhand,-0.116
+agree,31.067,forehand,31.017,forehand,-0.05
+heuristic_only,34.733,unknown,,,

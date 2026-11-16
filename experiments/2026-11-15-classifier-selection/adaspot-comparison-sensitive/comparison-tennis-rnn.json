@@ -1,0 +1,18 @@
+{
+  "note": "Agreement between proposals is not accuracy; review against the source video.",
+  "tolerance_seconds": 0.5,
+  "heuristic": {
+    "backhand": 3,
+    "unknown": 2,
+    "forehand": 2
+  },
+  "tennis-rnn": {
+    "backhand": 2,
+    "forehand": 3
+  },
+  "matched": 5,
+  "same_label": 4,
+  "different_label": 1,
+  "heuristic_only": 2,
+  "tennis-rnn_only": 0
+}
