@@ -1,129 +1,257 @@
 # Stroke Highlights
 
-Create local forehand and backhand video compilations from tennis footage.
-This standalone tool proposes strokes from player poses and supports manual CSV review.
+Review tennis shots and create separate forehand/backhand MP4 compilations.
+**Tennis RNN is the only classifier**, in both the browser and Python CLI.
+Video processing stays on your device; videos, frames, poses, and shot lists are
+not uploaded.
+
+The model choice, retired approaches, exact experiment settings, and measured
+results are recorded in [experiments/DECISIONS.md](experiments/DECISIONS.md).
 
 ## Setup
 
-Requirements: Python 3.10–3.12, uv, and FFmpeg (including ffprobe for export tests).
-On macOS, install FFmpeg with `brew install ffmpeg`.
-
-From this repository, install the project environment with uv:
+Requirements: Python 3.10–3.12 and [uv](https://docs.astral.sh/uv/). The browser
+build also requires Node.js 22+ and npm. CLI video export requires FFmpeg
+(`brew install ffmpeg` on macOS).
 
 ```bash
 uv sync
+python3 scripts/setup_tennis_rnn.py
+npm ci
+npm run dev
 ```
 
-## Forehand and Backhand Compilations
+Open the Vite URL, normally **http://127.0.0.1:5173**. Setup downloads and verifies
+MoveNet Lightning float16 v4 and the pretrained GRU checkpoint (about 4.9 MB
+combined). Browser setup exports the GRU's numeric weights, bundles the worker,
+and copies local WASM assets. Generated models/runtime files are ignored by Git.
+Python is needed during setup/build; the running website is static and needs no
+Python server, GPU, credentials, or API key.
 
-`stroke_highlights.py` finds swing candidates for one player and exports separate
-`forehands.mp4` and `backhands.mp4` compilations, with the source audio. It works
-with short clips or longer recordings, processing sampled frames without loading
-the whole video into memory. Install FFmpeg for video export (`brew install ffmpeg`
-on macOS).
+## Browser workflow
+
+1. Choose a recording. The full video becomes available immediately.
+2. Set the playing hand, clip padding, and mirrored-video option. Tennis RNN
+   currently follows only the **near-court player**.
+3. Click **Detect shots**. The worker samples at 30 Hz, runs MoveNet and the
+   30-frame GRU, and automatically compiles included forehands and backhands.
+4. Review each excerpt. Adjust its start/end or category, exclude a false
+   detection, or add a missed shot at the playhead. Editing invalidates old reels.
+5. Compile again and download each MP4. Overlapping excerpts are merged, source
+   audio is retained when present, and browser export uses 30 FPS.
+6. **Save shot list** downloads JSON. To resume, reopen the original recording and
+   use **Load shot list**. Reloading the main app otherwise clears its session.
+
+Manual shot review and compilation also work without detection. Cancel stops the
+active worker and retains the video and existing shot list.
+
+The browser uses the same pinned MoveNet model, GRU weights, feature order,
+handedness transform, thresholds, and postprocessing as Python. The GRU arithmetic
+is tested against Keras reference probabilities. Browser/OpenCV video decoding
+and WASM/native pose inference can differ, so end-to-end results need not be
+bit-for-bit identical.
+
+Use a fixed camera behind the baseline with the near player fully visible.
+The model distinguishes backhand, forehand, neutral, and serve. Neutral produces
+no event. Serves are excluded `unknown` events with `serve` retained in the note;
+only forehands/backhands enter compilations. This remains experimental recognition,
+not a substitute for reviewing the video.
+
+### Browser limits and hosting
+
+- Static app with local `blob:` video URLs, no upload endpoint, analytics, database,
+  or remote inference. All model/WASM requests go to the same website.
+- Requires a current desktop browser with WebAssembly, Web Workers, OffscreenCanvas,
+  and support for the input codec. H.264 MP4 is recommended. MOV does not guarantee
+  HEVC support. Inputs are limited to 500 MB; shorter clips work best.
+- MoveNet and FFmpeg run in workers. FFmpeg uses WORKERFS to avoid duplicating the
+  source file in its WASM filesystem. Long recordings can still exceed memory.
+- The app is not an offline PWA: loading/reloading needs its static assets.
 
 ```bash
-uv run python stroke_highlights.py "/path/to/tennis.mov" \
-  --output-dir outputs/tennis_strokes \
-  --player near --handedness right --stroke both --device mps
+npm run build
+npm run preview
 ```
 
-For **only forehands**, use `--stroke forehand`. For a short trial, add `--limit 30`;
-use a different output directory when subsequently analyzing the full video.
-Use `--device cpu` on machines without Apple GPU support.
+Build output is `dist/`; never host the repository root or personal recordings.
+Relative asset paths support subdirectory hosting when the URL ends with `/`.
+Serve `.wasm` as `application/wasm`. No cross-origin isolation is required.
+The document has a restrictive CSP. TensorFlow Lite's Emscripten worker uses
+runtime-generated JS bindings; if your host applies CSP to worker responses,
+account for that requirement separately from the document policy.
 
-This is an **experimental motion heuristic**, not a trained tennis action model.
-It uses the [Ultralytics COCO pose keypoints](https://docs.ultralytics.com/tasks/pose/)
-to detect fast wrist movement relative to the hips, then checks preparation side
-and swing direction. Scores measure rule strength, **not prediction probability**.
-No video is uploaded. The pose weights download on first use.
+The upstream Tennis RNN repository does not declare a license. Its weights are
+fetched locally rather than committed here; a browser build contains derived
+weights. Resolve the upstream redistribution terms before sharing such a build.
 
-### Camera and player settings
+## Python CLI
 
-- Use a fixed camera behind a baseline, with the player's body and racket arm
-  visible throughout the stroke. Side-on or moving cameras are not supported.
-  Timestamps use frame index / FPS; convert variable-frame-rate recordings to
-  constant frame rate first for accurate excerpt timing.
-- `--player near` selects the largest person with feet in the lower 45% of the
-  image, then follows their box by proximity.
-  `--player far` initially limits selection to the upper 65% of the image. These
-  are geometric selection rules, not player identity recognition.
-- On crowded courts, restrict the player's **foot position** with a normalized
-  `--roi LEFT TOP RIGHT BOTTOM`, e.g. `--roi 0 0.4 0.7 1`. Preview your framing
-  before picking these bounds. Players can be reacquired after a tracking gap;
-  a region helps avoid switching to someone on an adjacent court.
-- Detections smaller than 20% of the frame height are excluded for the near
-  player (5% for the far player). Adjust `--min-player-height` for your framing.
-  The default 1.8-second `--min-gap` reduces repeat detections from follow-through
-  and recovery; reduce it for drills with more frequent strokes.
-- Set `--handedness left` for a left-handed player; add `--mirrored` for a flipped
-  recording. If the player changes ends, process each camera-side section with
-  the appropriate settings.
-- Defaults include 1.2 seconds before and 0.9 seconds after each swing. Change
-  `--before` and `--after` to include more preparation or shorten the compilation.
-  Overlapping excerpts in the same category are merged to avoid repeated footage.
-
-### Review and re-export
-
-The output directory contains:
-
-- `strokes.csv`: proposed timestamps, clip boundaries, labels, rule scores, and
-  an `include` column. Ambiguous/overhead movements use `unknown` and are excluded.
-- `poses.json`: cached sampled player poses. Matching inputs and inference settings
-  can reuse this cache when changing detection thresholds or excerpt lengths.
-- `forehands.mp4` / `backhands.mp4`: created only for categories with included strokes.
-  Re-exporting an empty category with `--overwrite` removes its previous compilation.
-
-Edit the CSV to correct `stroke` (`forehand`, `backhand`, `unknown`, or `ignore`),
-set `include` to `true`/`false`, change `start`/`end` in seconds, or add missed strokes.
-Then export without running inference again:
+No classifier selection or optional model dependencies are needed:
 
 ```bash
-uv run python stroke_highlights.py "/path/to/tennis.mov" \
-  --events-csv outputs/tennis_strokes/strokes.csv \
-  --output-dir outputs/tennis_strokes --stroke forehand --overwrite
+uv run python stroke_highlights.py tennis.mp4 --output-dir outputs/session
 ```
 
-Use `--analyze-only` to generate detections before exporting. `--overwrite` allows
-replacing previous CSV/video outputs; running detection again replaces CSV edits.
-Incompatible pose caches cause an error: choose a new output directory or remove
-the cache explicitly. The source video is never overwritten.
-
-Brief wrist occlusions are interpolated; long occlusions, off-screen strokes,
-and uncertain body landmarks can cause missed shots. Practice swings, volleys,
-backswing movements, and other arm motions can cause false detections. Serves
-and smashes are not reliably classified. Inspect the proposals before treating
-a compilation as complete. Reliable shot recall across camera angles will require
-labeled tennis footage and a temporal action classifier, potentially using ball
-contact as an additional signal. This tool does not use ball tracking.
-
-### Verification
+For a quick analysis without video export:
 
 ```bash
-uv run python -m unittest discover -s tests -v
+uv run python stroke_highlights.py tennis.mp4 \
+  --output-dir outputs/trial --analyze-only --limit 30
 ```
 
-Tests cover handedness/view direction, occlusion boundaries, overhead exclusion,
-translation rejection, player regions, CSV validation, excerpt merging, and real
-FFmpeg exports with and without audio. These checks validate pipeline behavior;
-they do not measure stroke recognition accuracy on labeled tennis footage.
+Outputs:
 
-## Repository layout
+- `strokes.csv`: proposed shot times, label, score, inclusion flag, and reason.
+- `stroke-review.json`: loadable in the browser with the same source video.
+- `tennis-rnn-scores.npz`: cached window probabilities for threshold experiments.
+- `forehands.mp4` / `backhands.mp4`: included-category compilations, unless using
+  `--analyze-only`. Empty categories do not create an MP4.
 
-- `stroke_highlights.py`: command-line detection, CSV review, and video export.
-- `pose_utils.py`: model loading and pose result conversion.
-- `tests/test_stroke_highlights.py`: detection and real FFmpeg export checks.
-- `pyproject.toml`, `uv.lock`: standalone environment and locked dependencies.
+Useful settings:
 
-Videos, generated outputs, pose caches inside `outputs/`, and downloaded model
-weights are ignored by Git. Supply your own video path; no source footage or
-model weights are bundled. Run `uv run python stroke_highlights.py --help` for
-all options.
+| Option | Default | Purpose |
+| --- | --- | --- |
+| `--handedness` | `right` | `right` or `left` |
+| `--mirrored` | off | Unflip mirrored input before pose inference |
+| `--before`, `--after` | 1.2, 0.9 s | Excerpt padding |
+| `--tennis-rnn-threshold` | 0.98 | Minimum class probability, not calibrated accuracy |
+| `--tennis-rnn-min-gap` | 2.0 s | Cross-class duplicate suppression |
+| `--min-player-height` | 0.2 | Minimum player height as a fraction of frame height |
+| `--stroke` | `both` | Export forehand, backhand, or both |
+| `--overwrite` | off | Replace existing results; reuse a compatible score cache |
 
-## Origin
+The retained `--classifier tennis-rnn` and `--player near` spellings are optional;
+no other values are supported. Inference runs on CPU. A complete valid 30-frame
+pose window is required; short clips and tracking gaps may produce no proposals.
+Window timestamps use their centers. Each confident class run contributes its
+highest-scoring window, followed by duplicate suppression.
 
-Extracted from the local `tennis-highlights` project, including its uncommitted
-stroke-highlights implementation and tests. Only the pose helpers required by
-this tool were carried over. Set analysis/review, ball tracking, court detection,
-and 3D reconstruction remain in the original project. This repository starts
-with a fresh history; the original project and its working files are preserved.
+Changing threshold, minimum gap, or padding can reuse cached scores with
+`--overwrite`. Changing source video, handedness, mirroring, player-height filter,
+or analysis duration requires a new output directory. Original videos are never
+overwritten.
+
+Edit the CSV's categories, inclusion flags, or excerpt bounds, then export it
+without running the model again:
+
+```bash
+uv run python stroke_highlights.py tennis.mp4 --output-dir outputs/reviewed \
+  --events-csv outputs/session/strokes.csv
+```
+
+Use constant-frame-rate input for repeatable timing. For variable-frame-rate or
+inconsistently decoded MOV files, normalize to a new source first:
+
+```bash
+ffmpeg -i input.mov -map 0:v:0 -map '0:a:0?' -vf fps=30 \
+  -c:v libx264 -crf 20 -pix_fmt yuv420p -c:a aac source-30fps.mp4
+```
+
+## Experiments and verification
+
+### Human-reviewed regression set
+
+```bash
+uv run python regression_review.py propose
+uv run python regression_review.py serve
+```
+
+Open **http://127.0.0.1:8780/**. The simple review queue contains 20 shuffled short
+clips: six prior shot moments, two prior no-shot/partial-shot moments, eight random
+sections, and four low-motion candidates. The original continuous context segment
+is retained on disk but excluded from the single-label queue.
+
+The existing Tennis RNN pipeline (MoveNet Lightning plus the pretrained GRU) runs
+on each clip using its current Python CPU implementation and default thresholds.
+`proposals.json` records its suggestions, model hashes, backend revision, settings,
+and clip hashes. Cached inference scores are kept locally. Suggestions are never
+human ground truth until explicitly approved or corrected.
+
+Watch the near-court player and click **Approve & next**, or **Deny / choose another
+label** and select **Forehand**, **Backhand**, **No shot**, or **Unsure**. Each decision
+saves immediately to `annotations.json` and advances to an unfinished clip. You
+can revisit clips to change a decision. No timestamps or contact markers are
+required. Choose Unsure for mixed forehands/backhands, serves, or unclear footage;
+these labels are retained in the review. The current regression policy combines
+Unsure and No shot as negative. Insufficient tracked poses also
+produce an Unsure suggestion, never an automatic No shot label.
+
+Approval stays beside the video at desktop and embedded-browser widths. Keyboard
+shortcuts: **A** approve, **D** show corrections, **1–4** choose forehand/backhand/
+no shot/unsure while corrections are open, **P** play/pause, and **R** replay.
+Shortcuts ignore held-key repeats, modifier keys, and editable controls.
+
+Reloading resumes at the first unfinished clip. Existing human labels from the
+older detailed reviewer are preserved when unambiguous; the original annotations
+are backed up to `annotations-before-simple-review.json` before migration.
+**Download review** provides a portable backup.
+
+**Freeze reviewed dataset** requires a human decision for every review clip,
+verifies video/source SHA-256 hashes, and saves a separate `frozen-r…json` snapshot.
+The snapshot evaluates clip labels (agreement, precision/recall, confusion matrix).
+**Detection times and contact times are not regression criteria.** Source intervals
+are retained solely to reproduce the excerpts. Freezing does not merge an
+optimization, and the draft remains editable.
+
+The current policy and acceptance gates are defined in [docs/regression-evaluation-policy.json](docs/regression-evaluation-policy.json). Future optimization agents must follow [docs/optimization-regression.md](docs/optimization-regression.md): retain all positives and report zero false negatives for each stroke class. The dataset-local `evaluation-policy.json` pins this policy to the immutable snapshot.
+
+Run a fresh browser baseline against a frozen snapshot (choose a new output file
+for each run), open the printed loopback URL, and click **Run baseline**:
+
+```bash
+node scripts/evaluate-browser.mjs outputs/regression-review-v1/frozen-r26-a895bb7c8595.json experiments/browser-regression-run.json
+node --test tests/regression-metrics.test.js
+```
+
+The runner verifies clip hashes and builds the current browser worker, then runs
+each clip with a fresh tracker. Its JSON records code/model hashes, settings,
+browser information, raw predictions, confusion matrix, precision/recall, and
+individual mismatches. Forehand and Backhand are the only positive classes.
+Human Unsure and No shot labels are both negative; no positive detection is also
+negative, including insufficient tracked poses. Tracking failures remain diagnostic.
+Mixed forehand/backhand detections count toward both positive classes and cannot
+pass as negative. The scoring policy is versioned separately from frozen labels. Runtime is
+descriptive, not a controlled speed benchmark. Review suggestions and labels are
+never overwritten.
+
+This is a starter corpus of existing local footage, not evidence of broad model
+accuracy. Keep related recordings and overlapping clips in the same data split.
+The original source videos and review excerpts remain local under ignored
+`outputs/`. To reproduce sampling, use a new output directory:
+
+```bash
+uv run python regression_review.py build --directory outputs/regression-review-v2 --seed 20261115
+uv run python regression_review.py propose --directory outputs/regression-review-v2
+uv run python regression_review.py serve --directory outputs/regression-review-v2
+```
+
+[The decision log](experiments/DECISIONS.md) preserves the motion heuristic,
+MediaPipe browser rules, and AdaSpot trials, their limitations, and why Tennis RNN
+was selected. Those classifiers are no longer executable options. Small historical
+prediction/settings snapshots are under `experiments/2026-11-15-classifier-selection/`.
+
+`review_comparison.py` is an **archive viewer**, not an inference entry point.
+It can still replay existing comparison outputs with the matching local source:
+
+```bash
+python3 review_comparison.py \
+  experiments/2026-11-15-classifier-selection/adaspot-comparison-sensitive \
+  --video outputs/adaspot-comparison-input.mp4
+```
+
+It serves only the chosen video and review assets on localhost. Historical review
+calls/notes stay in browser storage and can be downloaded. The old local
+`outputs/` experiments remain available as well.
+
+```bash
+uv run python -m unittest discover -s tests -p 'test_*.py'
+npm run setup
+npm test
+npm run build
+```
+
+Tests cover default-only CLI routing, rejected retired classifiers, output
+protection, cache identity, 30 Hz sampling, feature order/reflection, neutral and
+serve handling, temporal suppression, Keras/browser GRU parity, review validation,
+and actual FFmpeg audio/silent-input exports. These verify implementation, not
+recognition accuracy. See the decision log for the remaining evaluation work.
