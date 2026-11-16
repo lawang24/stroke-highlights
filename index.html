@@ -10,11 +10,14 @@
 </head>
 <body>
   <main>
-    <h1>Stroke Highlights</h1>
+    <header class="app-header">
+      <h1>Stroke Highlights</h1>
+      <span class="muted">Processed locally in your browser</span>
+    </header>
     <section aria-labelledby="session-title">
-      <h2 id="session-title">Video</h2>
       <div class="session-grid">
         <div class="video-column">
+          <h2 id="session-title">Video</h2>
           <label id="drop-zone" class="drop-zone" for="file-input">
             <span><span class="text-link">Choose a video</span> or drop it here</span>
             <span class="muted">MP4, MOV, WebM · up to 500 MB</span>
@@ -27,10 +30,9 @@
               <button id="replace-video">Change video</button>
             </div>
           </div>
-          <p class="hint">Video processing stays in this browser.</p>
         </div>
-        <form id="settings" class="settings">
-          <p class="hint"><strong>Tennis RNN</strong> · Near-court player</p>
+        <form id="settings" class="settings" aria-labelledby="settings-title">
+          <h2 id="settings-title">Detection</h2>
           <label for="handedness">Playing hand</label>
           <select id="handedness"><option value="right">Right-handed</option><option value="left">Left-handed</option></select>
           <div class="timing-fields">
@@ -39,7 +41,7 @@
           </div>
           <label class="checkbox-label"><input id="mirrored" type="checkbox" /> Mirrored video</label>
           <button id="analyze" class="primary" type="submit" disabled>Detect shots</button>
-          <p class="hint">Use a fixed camera behind the baseline, with the player fully visible.</p>
+          <p class="hint">Tracks the near-court player. Use a fixed camera behind the baseline with the player fully visible.</p>
         </form>
       </div>
       <div id="status-panel" class="status-panel" hidden>
@@ -48,9 +50,9 @@
       </div>
       <p id="error" class="error" role="alert" hidden></p>
     </section>
-    <section id="review-section" hidden>
+    <section id="review-section" aria-labelledby="shots-title" hidden>
       <div class="section-heading">
-        <h2>Shots</h2>
+        <h2 id="shots-title">Shots</h2>
         <div class="review-actions">
           <button id="save-review">Save shot list</button>
           <button id="load-review">Load shot list</button>
@@ -65,8 +67,9 @@
         </table>
         <p id="no-shots" class="no-shots" hidden>No shots. Run detection or add a shot at the playhead.</p>
       </div>
+      <p class="hint">Detection is experimental. Review shots before exporting.</p>
     </section>
-    <section id="results" aria-labelledby="results-title">
+    <section id="results" aria-labelledby="results-title" hidden>
       <div class="section-heading"><h2 id="results-title">Compilations</h2><button id="compile-all" disabled title="Create separate forehand and backhand videos from included shots">Compile both</button></div>
       <div class="compilation-grid">
         <article class="compilation-card" data-stroke="forehand">
@@ -80,7 +83,6 @@
           <div class="card-footer"><span id="backhand-duration" class="muted"></span><button id="compile-backhand" disabled>Compile</button><a id="download-backhand" hidden download="backhands.mp4">Download MP4</a></div>
         </article>
       </div>
-      <p class="hint">Detection is experimental. Review shots before exporting. Only forehands and backhands are supported.</p>
     </section>
   </main>
   <script type="module" src="/web/main.js"></script>

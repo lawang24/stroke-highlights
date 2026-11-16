@@ -30,6 +30,8 @@ function invalidateReels() {
 
 function updateControls() {
   const busy = !!state.controller;
+  $('results').hidden = !state.file;
+  $('progress').hidden = !busy;
   let valid = true;
   try { validateEvents(state.events, state.duration); } catch { valid = false; }
   document.body.classList.toggle('busy', busy);
