@@ -11,3 +11,7 @@ outputs/
 *.MOV
 *.mkv
 *.webm
+node_modules/
+dist/
+public/runtime/
+models/

@@ -1,15 +1,14 @@
 [project]
 name = "stroke-highlights"
 version = "0.1.0"
-description = "Local pose-based tennis stroke detection and video compilations."
+description = "Local Tennis RNN stroke detection and video compilations."
 readme = "README.md"
 requires-python = ">=3.10,<3.13"
 dependencies = [
     "numpy>=1.26,<3",
     "opencv-python>=4.8",
-    "scipy>=1.11",
-    "tqdm>=4.66",
-    "ultralytics>=8.4.46",
+    "tensorflow==2.20.0",
+    "h5py>=3.11",
 ]
 
 [tool.uv]
