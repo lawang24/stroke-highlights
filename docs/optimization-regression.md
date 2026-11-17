@@ -40,3 +40,9 @@ With this policy, the frozen browser baseline and corrected decoder experiment c
 The isolated sequential-decode experiment is at `/Users/lawrence/.codex/worktrees/tennis-sequential-decode/stroke-highlights/experiments/sequential-decode/`. Its `frozen-r26/check.mjs` recomputes exact comparisons from raw traces and rejects stale code/model/media identities; `frozen-r26/REPORT.md` and `report.json` contain results. Its `trial/README.md` documents the separate local preview. Inspect the latest status rather than assuming an in-progress full-source run has passed.
 
 Do not merge, deploy or promote an optimization without explicit user authorization. Passing this regression suite is evidence, not authorization. Broader browser, codec, VFR, rotation, cancellation/native failure and resource coverage must be reported honestly rather than inferred from the starter corpus.
+
+## Default reader promotion (2026-11-16)
+
+At the user's request, the compatible sequential reader is now the application default. The preview's original-mode selector is removed; the original seeking reader remains only as an automatic compatibility fallback. [Promotion validation](../experiments/2026-11-16-fast-default-report.json) records fresh paired inference on all 20 scored clips and both continuous original sources: 12,844 exact input tensors, 6,801 score windows and 35 events per version. All 7 positive clips are retained, with zero false negatives for either positive class and zero false positives. The six zero-window negatives remain tracking diagnostics.
+
+Raw baseline/candidate traces, frozen baseline source/model/lock bytes, source identities, the checker and lifecycle evidence remain under `experiments/sequential-decode/promotion-20261116/` in the isolated decoder worktree referenced above. This is correctness evidence on the starter corpus, not a new speed benchmark or broader browser/codec claim.

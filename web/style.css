@@ -102,6 +102,11 @@ progress { display: block; width: 100%; height: 6px; margin-top: 10px; accent-co
 .error { color: #9a2424; background: #fff4f4; padding: 12px; border: 1px solid #e7c1c1; border-radius: 4px; margin-top: 12px; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 
+.test-clips-dialog { width: min(440px, calc(100% - 32px)); padding: 20px; border: 1px solid #e0e5e8; border-radius: 10px; color: inherit; }
+.test-clips-dialog::backdrop { background: rgb(20 30 35 / 30%); }
+.test-clips-dialog select { display: block; width: 100%; margin-top: 6px; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+
 @media (max-width: 700px) {
   main { padding: 16px; }
   main > section { padding: 16px; }

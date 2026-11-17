@@ -17,7 +17,7 @@
     <section aria-labelledby="session-title">
       <div class="session-grid">
         <div class="video-column">
-          <h2 id="session-title">Video</h2>
+          <div id="video-heading" class="section-heading"><h2 id="session-title">Video</h2></div>
           <label id="drop-zone" class="drop-zone" for="file-input">
             <span><span class="text-link">Choose a video</span> or drop it here</span>
             <span class="muted">MP4, MOV, WebM · up to 500 MB</span>
@@ -33,6 +33,7 @@
         </div>
         <form id="settings" class="settings" aria-labelledby="settings-title">
           <h2 id="settings-title">Detection</h2>
+          <p class="hint" id="reader-status" aria-live="polite"></p>
           <label for="handedness">Playing hand</label>
           <select id="handedness"><option value="right">Right-handed</option><option value="left">Left-handed</option></select>
           <div class="timing-fields">
@@ -84,6 +85,10 @@
         </article>
       </div>
     </section>
+    <footer class="hint">
+      Shot recognition uses the pretrained Tennis RNN model from
+      <a href="https://github.com/antoinekeller/tennis_shot_recognition" target="_blank" rel="noopener noreferrer">antoinekeller/tennis_shot_recognition</a>.
+    </footer>
   </main>
   <script type="module" src="/web/main.js"></script>
 </body>

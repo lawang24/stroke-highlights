@@ -1,4 +1,5 @@
 import { decodeScores } from './tennis-rnn.js';
+import { createSequentialSource } from './sequential-decoder.js';
 
 const base = new URL(import.meta.env.BASE_URL, location.href).href;
 const abortError = () => new DOMException('Cancelled', 'AbortError');
@@ -24,6 +25,24 @@ export function waitForMedia(video, event, signal, trigger) {
 }
 
 export async function analyzeVideo(url, options, signal, progress) {
+  const { blob: suppliedBlob, onReader, ...settings } = options;
+  try {
+    const blob = suppliedBlob || await (await fetch(url, { signal })).blob();
+    const events = await analyzeAttempt(url, settings, signal, progress, blob);
+    onReader?.('Fast detection');
+    return events;
+  } catch (error) {
+    if (signal.aborted || error?.name === 'AbortError') throw error;
+    progress('Using the compatibility reader for this video…', 0);
+    // Each attempt owns a fresh worker, crop and sequence state.
+    const events = await analyzeAttempt(url, settings, signal, progress);
+    onReader?.('Compatibility reader used for this video');
+    return events;
+  }
+}
+
+async function analyzeAttempt(url, options, signal, progress, blob) {
+  let source, pending;
   const worker = new Worker(`${base}runtime/tennis-worker.js`);
   const video = document.createElement('video');
   video.muted = true;
@@ -51,18 +70,39 @@ export async function analyzeVideo(url, options, signal, progress) {
     const ctx = canvas.getContext('2d');
     const samples = [];
     const count = Math.ceil(video.duration * 30);
+    if (blob) {
+      // Preserve the video element's initial frame exactly as in the baseline.
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      source = await createSequentialSource(blob, signal);
+    }
+    const acquire = async (i) => {
+      const time = Math.min(i / 30, video.duration - .001);
+      if (source) {
+        if (i !== 0) await source.draw(ctx, time, canvas.width, canvas.height);
+      } else {
+        if (Math.abs(video.currentTime - time) > .001) await waitForMedia(video, 'seeked', signal, () => { video.currentTime = time; });
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      }
+      const bitmap = await createImageBitmap(canvas);
+      if (signal.aborted) { bitmap.close(); throw abortError(); }
+      return { bitmap, time };
+    };
     for (let i = 0; i < count; i++) {
       if (signal.aborted) throw abortError();
-      const time = Math.min(i / 30, video.duration - .001);
-      if (Math.abs(video.currentTime - time) > .001) await waitForMedia(video, 'seeked', signal, () => { video.currentTime = time; });
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const bitmap = await createImageBitmap(canvas);
+      const { bitmap, time } = await (pending || acquire(i));
+      pending = null;
+      if (source && i + 1 < count) {
+        pending = acquire(i + 1);
+        pending.catch(() => {});
+      }
       const { prediction } = await ask({ type: 'frame', bitmap, time }, [bitmap]);
       if (prediction) samples.push(prediction);
       if (i % 5 === 0 || i === count - 1) progress(`Tennis RNN · ${Math.round(time)} of ${Math.round(video.duration)} seconds analyzed`, (i + 1) / count * 100);
     }
     return decodeScores(samples, video.duration, options);
   } finally {
+    await source?.close();
+    if (pending) { try { (await pending).bitmap.close(); } catch {} }
     signal.removeEventListener('abort', stop);
     worker.terminate();
     video.removeAttribute('src');

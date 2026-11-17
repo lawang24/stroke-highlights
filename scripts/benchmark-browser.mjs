@@ -39,8 +39,10 @@ media = replace(media, '`${base}runtime/tennis-worker.js`', '`${base}${options.v
 media = replace(media, "progress('Loading Tennis RNN…', 0);", "const started = performance.now(); const timings = []; progress('Loading Tennis RNN…', 0);");
 media = replace(media, 'const count = Math.ceil(video.duration * 30);', 'const count = Math.ceil(Math.min(video.duration, options.limit || Infinity) * 30); const setupMs = performance.now() - started;');
 media = replace(media, 'const time = Math.min(i / 30, video.duration - .001);', 'const frameStart = performance.now(); const time = Math.min(i / 30, video.duration - .001);');
-media = replace(media, 'ctx.drawImage(video, 0, 0, canvas.width, canvas.height);', 'const seekEnd = performance.now(); ctx.drawImage(video, 0, 0, canvas.width, canvas.height);');
-media = replace(media, "const { prediction } = await ask({ type: 'frame', bitmap, time }, [bitmap]);", "const bitmapEnd = performance.now(); const { prediction, timing } = await ask({ type: 'frame', bitmap, time }, [bitmap]); timings.push({...timing, seekMs: seekEnd-frameStart, bitmapMs: bitmapEnd-seekEnd, workerMs: performance.now()-bitmapEnd});");
+media = replace(media, 'const bitmap = await createImageBitmap(canvas);', 'const seekEnd = performance.now(); const bitmap = await createImageBitmap(canvas);');
+media = replace(media, 'return { bitmap, time };', 'return { bitmap, time, seekMs: seekEnd-frameStart, bitmapMs: performance.now()-seekEnd };');
+media = replace(media, 'const { bitmap, time } = await (pending || acquire(i));', 'const { bitmap, time, seekMs, bitmapMs } = await (pending || acquire(i));');
+media = replace(media, "const { prediction } = await ask({ type: 'frame', bitmap, time }, [bitmap]);", "const bitmapEnd = performance.now(); const { prediction, timing } = await ask({ type: 'frame', bitmap, time }, [bitmap]); timings.push({...timing, seekMs, bitmapMs, workerMs: performance.now()-bitmapEnd});");
 media = replace(media, 'return decodeScores(samples, video.duration, options);', 'const events = decodeScores(samples, video.duration, options); return {elapsedMs: performance.now()-started, setupMs, frames: count, duration: video.duration, width: canvas.width, height: canvas.height, timings, samples, events};');
 await bundle(media + `
 const status = document.querySelector('#status'), results = document.querySelector('#results');

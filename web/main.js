@@ -4,6 +4,7 @@ import { analyzeVideo, exportReel, waitForMedia } from './media.js';
 const $ = (id) => document.getElementById(id);
 const labels = ['forehand', 'backhand'];
 const state = { file: null, url: null, duration: 0, events: [], reels: {}, controller: null, analyzed: false, classifier: 'manual' };
+let devClipPicker;
 const formatTime = (seconds) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
 const showError = (message = '') => { $('error').textContent = message; $('error').hidden = !message; };
 const report = (text, percent) => {
@@ -30,6 +31,7 @@ function invalidateReels() {
 
 function updateControls() {
   const busy = !!state.controller;
+  devClipPicker?.setBusy(busy);
   $('results').hidden = !state.file;
   $('progress').hidden = !busy;
   let valid = true;
@@ -159,6 +161,7 @@ async function chooseVideo(file) {
       $('drop-zone').hidden = true; $('source-panel').hidden = false;
       $('file-name').textContent = file.name;
       $('file-meta').textContent = `${formatTime(probe.duration)} · ${probe.videoWidth} × ${probe.videoHeight} · ${(file.size / 1024 / 1024).toFixed(1)} MB`;
+      $('reader-status').textContent = '';
       report('Video ready. Detect shots or add them manually.', 0);
       renderReview();
     } finally {
@@ -169,6 +172,23 @@ async function chooseVideo(file) {
 }
 
 $('file-input').addEventListener('change', (event) => { const file = event.target.files[0]; event.target.value = ''; chooseVideo(file); });
+if (import.meta.env.DEV) {
+  import('./dev-clips.js').then(({ setupTestClips }) => {
+    devClipPicker = setupTestClips(async clip => {
+      let file;
+      await operation(async signal => {
+        report('Loading test clip…', 0);
+        const response = await fetch(`/__dev/test-clips/${clip.id}`, { signal });
+        if (!response.ok) throw new Error('Could not load this test clip. Reopen Test clips and try again.');
+        const blob = await response.blob();
+        signal.throwIfAborted();
+        file = new File([blob], clip.name, { type: clip.type, lastModified: clip.lastModified });
+      });
+      if (file) await chooseVideo(file);
+    });
+    updateControls();
+  }).catch(() => showError('The test clip picker could not load. Refresh to try again.'));
+}
 $('replace-video').addEventListener('click', () => $('file-input').click());
 const dropZone = $('drop-zone');
 for (const name of ['dragenter', 'dragover']) dropZone.addEventListener(name, event => { event.preventDefault(); dropZone.classList.add('dragging'); });
@@ -183,7 +203,8 @@ $('settings').addEventListener('submit', event => {
   const settings = options();
   operation(async signal => {
     $('source-video').pause();
-    const events = await analyzeVideo(state.url, settings, signal, report);
+    $('reader-status').textContent = '';
+    const events = await analyzeVideo(state.url, { ...settings, blob: state.file, onReader: text => { $('reader-status').textContent = text; } }, signal, report);
     invalidateReels(); state.events = events; state.analyzed = true; state.classifier = 'tennis-rnn';
     renderReview();
     await compile(labels, signal);

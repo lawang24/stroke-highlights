@@ -1,0 +1,1116 @@
+{
+  "status": "passed",
+  "createdAt": "2026-11-16T15:54:36.080Z",
+  "scope": "Fresh baseline and candidate inference: 20 scored clips and both complete sources, right-handed/unmirrored, embedded Chromium; exact full inputs, poses, crops, validity, scores and events.",
+  "identity": {
+    "createdAt": "2026-11-16T15:23:32.042Z",
+    "hashes": {
+      "web/media.js": "16b971d4b44c219ea5427641120686719bd31737d929b5dbdb5d5eb1abe485b5",
+      "web/sequential-decoder.js": "f696508d962a1e26be49361bcbfd202f2dba3dd0c00c84238d309d5e682ad665",
+      "web/tennis.worker.js": "f61030710af3c05cacaba2dd324e25053c55576101f86ec1e2f9e19539e28b02",
+      "web/tennis-rnn.js": "4be9f5cff8f1fe5d026e282e791bfec75f8d6056188dba991ed995fd11ec9189",
+      "package-lock.json": "f353ad02c1bb728b95c9cfb3c9e3c5dab01f0fd9f8b58797ff75172c18d5ec99",
+      "public/runtime/tennis-rnn/weights.json": "006e5fb26f6ec59162e3d16773d3e8c8e28b2a1eea3ff3e60c51a20bf0dc566e",
+      "public/runtime/tennis-rnn/movenet.tflite": "0fac2226112d0371903ca86e3853cec24ef603a0b2f96f589b180f0ebdd135ab",
+      "scripts/regression-metrics.mjs": "717bb887cb042bff43e7c2eba91f56f606a5f1858e77ffce5df2bf556038d077",
+      "docs/regression-evaluation-policy.json": "95e258e710568c3a0a396af703f1f6fe1590ad50241ec1fefa641587f6efd3f1"
+    },
+    "baselineHashes": {
+      "web/media.js": "e9d7173b04ec77dd705ac600a16f62d3e41fe4d0f56da4041449c42f523b3cea",
+      "web/tennis.worker.js": "f61030710af3c05cacaba2dd324e25053c55576101f86ec1e2f9e19539e28b02",
+      "web/tennis-rnn.js": "4be9f5cff8f1fe5d026e282e791bfec75f8d6056188dba991ed995fd11ec9189",
+      "package.json": "ee0fb4583c83cc12d2be6a8b17649deb17bf831380f427f04a40c8ee70e9b6bc",
+      "package-lock.json": "4cd394d43c482b8526af02a5e461fb6f4517e422fe70b3b5a665aac4511cb929",
+      "public/runtime/tennis-rnn/weights.json": "006e5fb26f6ec59162e3d16773d3e8c8e28b2a1eea3ff3e60c51a20bf0dc566e",
+      "public/runtime/tennis-rnn/movenet.tflite": "0fac2226112d0371903ca86e3853cec24ef603a0b2f96f589b180f0ebdd135ab"
+    },
+    "frozenSHA256": "a895bb7c8595a1fa3ec63943bc348d32f1c0db75b82a7867da2f19a39ade382d"
+  },
+  "pairs": [
+    {
+      "id": "clip-001",
+      "frames": 120,
+      "scoreWindows": 91,
+      "events": 1,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-002",
+      "frames": 120,
+      "scoreWindows": 35,
+      "events": 0,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-003",
+      "frames": 180,
+      "scoreWindows": 51,
+      "events": 0,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-004",
+      "frames": 120,
+      "scoreWindows": 0,
+      "events": 0,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-005",
+      "frames": 180,
+      "scoreWindows": 0,
+      "events": 0,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-006",
+      "frames": 180,
+      "scoreWindows": 151,
+      "events": 0,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-007",
+      "frames": 120,
+      "scoreWindows": 0,
+      "events": 0,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-008",
+      "frames": 180,
+      "scoreWindows": 0,
+      "events": 0,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-009",
+      "frames": 180,
+      "scoreWindows": 38,
+      "events": 0,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-010",
+      "frames": 180,
+      "scoreWindows": 151,
+      "events": 1,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-012",
+      "frames": 120,
+      "scoreWindows": 0,
+      "events": 0,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-013",
+      "frames": 180,
+      "scoreWindows": 100,
+      "events": 1,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-014",
+      "frames": 120,
+      "scoreWindows": 0,
+      "events": 0,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-015",
+      "frames": 120,
+      "scoreWindows": 91,
+      "events": 1,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-016",
+      "frames": 120,
+      "scoreWindows": 91,
+      "events": 1,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-017",
+      "frames": 58,
+      "scoreWindows": 29,
+      "events": 0,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-018",
+      "frames": 120,
+      "scoreWindows": 91,
+      "events": 1,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-019",
+      "frames": 120,
+      "scoreWindows": 91,
+      "events": 1,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-020",
+      "frames": 90,
+      "scoreWindows": 61,
+      "events": 0,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "clip-021",
+      "frames": 180,
+      "scoreWindows": 10,
+      "events": 0,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "source-1",
+      "frames": 1056,
+      "scoreWindows": 971,
+      "events": 5,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    },
+    {
+      "id": "source-2",
+      "frames": 9000,
+      "scoreWindows": 4749,
+      "events": 23,
+      "reader": "Fast detection",
+      "differences": {
+        "settings": false,
+        "frames": false,
+        "times": 0,
+        "inputs": 0,
+        "poses": 0,
+        "usedCrops": 0,
+        "outputCrops": 0,
+        "validity": 0,
+        "scores": false,
+        "events": false
+      },
+      "exact": true
+    }
+  ],
+  "missing": [],
+  "errors": [],
+  "metrics": {
+    "baseline": {
+      "scoringPolicy": "forehand-backhand-positives-v1",
+      "total": 20,
+      "correct": 20,
+      "accuracy": 1,
+      "trackingFailures": 6,
+      "policy": "Human unsure and no_shot are negative. No forehand/backhand events means negative, including tracking failures. Any forehand/backhand detection counts as a positive; mixed positives cannot pass as negative. Clip labels only; no detection/contact timing checks.",
+      "perClass": {
+        "forehand": {
+          "support": 5,
+          "correct": 5,
+          "predicted": 5,
+          "falsePositives": 0,
+          "falseNegatives": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "backhand": {
+          "support": 2,
+          "correct": 2,
+          "predicted": 2,
+          "falsePositives": 0,
+          "falseNegatives": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "no_shot": {
+          "support": 13,
+          "correct": 13,
+          "predicted": 13,
+          "falsePositives": 0,
+          "falseNegatives": 0,
+          "precision": 1,
+          "recall": 1
+        }
+      },
+      "confusion": {
+        "forehand": {
+          "forehand": 5,
+          "backhand": 0,
+          "no_shot": 0,
+          "mixed": 0
+        },
+        "backhand": {
+          "forehand": 0,
+          "backhand": 2,
+          "no_shot": 0,
+          "mixed": 0
+        },
+        "no_shot": {
+          "forehand": 0,
+          "backhand": 0,
+          "no_shot": 13,
+          "mixed": 0
+        }
+      },
+      "clips": [
+        {
+          "clipId": "clip-001",
+          "humanLabel": "backhand",
+          "expected": "backhand",
+          "predicted": "backhand",
+          "predictedPositives": [
+            "backhand"
+          ],
+          "correct": true,
+          "classifiedWindows": 91,
+          "reason": null
+        },
+        {
+          "clipId": "clip-002",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 35,
+          "reason": null
+        },
+        {
+          "clipId": "clip-003",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 51,
+          "reason": null
+        },
+        {
+          "clipId": "clip-004",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 0,
+          "reason": "insufficient_tracked_poses"
+        },
+        {
+          "clipId": "clip-005",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 0,
+          "reason": "insufficient_tracked_poses"
+        },
+        {
+          "clipId": "clip-006",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 151,
+          "reason": null
+        },
+        {
+          "clipId": "clip-007",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 0,
+          "reason": "insufficient_tracked_poses"
+        },
+        {
+          "clipId": "clip-008",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 0,
+          "reason": "insufficient_tracked_poses"
+        },
+        {
+          "clipId": "clip-009",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 38,
+          "reason": null
+        },
+        {
+          "clipId": "clip-010",
+          "humanLabel": "forehand",
+          "expected": "forehand",
+          "predicted": "forehand",
+          "predictedPositives": [
+            "forehand"
+          ],
+          "correct": true,
+          "classifiedWindows": 151,
+          "reason": null
+        },
+        {
+          "clipId": "clip-012",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 0,
+          "reason": "insufficient_tracked_poses"
+        },
+        {
+          "clipId": "clip-013",
+          "humanLabel": "forehand",
+          "expected": "forehand",
+          "predicted": "forehand",
+          "predictedPositives": [
+            "forehand"
+          ],
+          "correct": true,
+          "classifiedWindows": 100,
+          "reason": null
+        },
+        {
+          "clipId": "clip-014",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 0,
+          "reason": "insufficient_tracked_poses"
+        },
+        {
+          "clipId": "clip-015",
+          "humanLabel": "forehand",
+          "expected": "forehand",
+          "predicted": "forehand",
+          "predictedPositives": [
+            "forehand"
+          ],
+          "correct": true,
+          "classifiedWindows": 91,
+          "reason": null
+        },
+        {
+          "clipId": "clip-016",
+          "humanLabel": "forehand",
+          "expected": "forehand",
+          "predicted": "forehand",
+          "predictedPositives": [
+            "forehand"
+          ],
+          "correct": true,
+          "classifiedWindows": 91,
+          "reason": null
+        },
+        {
+          "clipId": "clip-017",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 29,
+          "reason": null
+        },
+        {
+          "clipId": "clip-018",
+          "humanLabel": "backhand",
+          "expected": "backhand",
+          "predicted": "backhand",
+          "predictedPositives": [
+            "backhand"
+          ],
+          "correct": true,
+          "classifiedWindows": 91,
+          "reason": null
+        },
+        {
+          "clipId": "clip-019",
+          "humanLabel": "forehand",
+          "expected": "forehand",
+          "predicted": "forehand",
+          "predictedPositives": [
+            "forehand"
+          ],
+          "correct": true,
+          "classifiedWindows": 91,
+          "reason": null
+        },
+        {
+          "clipId": "clip-020",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 61,
+          "reason": null
+        },
+        {
+          "clipId": "clip-021",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 10,
+          "reason": null
+        }
+      ],
+      "mismatches": []
+    },
+    "candidate": {
+      "scoringPolicy": "forehand-backhand-positives-v1",
+      "total": 20,
+      "correct": 20,
+      "accuracy": 1,
+      "trackingFailures": 6,
+      "policy": "Human unsure and no_shot are negative. No forehand/backhand events means negative, including tracking failures. Any forehand/backhand detection counts as a positive; mixed positives cannot pass as negative. Clip labels only; no detection/contact timing checks.",
+      "perClass": {
+        "forehand": {
+          "support": 5,
+          "correct": 5,
+          "predicted": 5,
+          "falsePositives": 0,
+          "falseNegatives": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "backhand": {
+          "support": 2,
+          "correct": 2,
+          "predicted": 2,
+          "falsePositives": 0,
+          "falseNegatives": 0,
+          "precision": 1,
+          "recall": 1
+        },
+        "no_shot": {
+          "support": 13,
+          "correct": 13,
+          "predicted": 13,
+          "falsePositives": 0,
+          "falseNegatives": 0,
+          "precision": 1,
+          "recall": 1
+        }
+      },
+      "confusion": {
+        "forehand": {
+          "forehand": 5,
+          "backhand": 0,
+          "no_shot": 0,
+          "mixed": 0
+        },
+        "backhand": {
+          "forehand": 0,
+          "backhand": 2,
+          "no_shot": 0,
+          "mixed": 0
+        },
+        "no_shot": {
+          "forehand": 0,
+          "backhand": 0,
+          "no_shot": 13,
+          "mixed": 0
+        }
+      },
+      "clips": [
+        {
+          "clipId": "clip-001",
+          "humanLabel": "backhand",
+          "expected": "backhand",
+          "predicted": "backhand",
+          "predictedPositives": [
+            "backhand"
+          ],
+          "correct": true,
+          "classifiedWindows": 91,
+          "reason": null
+        },
+        {
+          "clipId": "clip-002",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 35,
+          "reason": null
+        },
+        {
+          "clipId": "clip-003",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 51,
+          "reason": null
+        },
+        {
+          "clipId": "clip-004",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 0,
+          "reason": "insufficient_tracked_poses"
+        },
+        {
+          "clipId": "clip-005",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 0,
+          "reason": "insufficient_tracked_poses"
+        },
+        {
+          "clipId": "clip-006",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 151,
+          "reason": null
+        },
+        {
+          "clipId": "clip-007",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 0,
+          "reason": "insufficient_tracked_poses"
+        },
+        {
+          "clipId": "clip-008",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 0,
+          "reason": "insufficient_tracked_poses"
+        },
+        {
+          "clipId": "clip-009",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 38,
+          "reason": null
+        },
+        {
+          "clipId": "clip-010",
+          "humanLabel": "forehand",
+          "expected": "forehand",
+          "predicted": "forehand",
+          "predictedPositives": [
+            "forehand"
+          ],
+          "correct": true,
+          "classifiedWindows": 151,
+          "reason": null
+        },
+        {
+          "clipId": "clip-012",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 0,
+          "reason": "insufficient_tracked_poses"
+        },
+        {
+          "clipId": "clip-013",
+          "humanLabel": "forehand",
+          "expected": "forehand",
+          "predicted": "forehand",
+          "predictedPositives": [
+            "forehand"
+          ],
+          "correct": true,
+          "classifiedWindows": 100,
+          "reason": null
+        },
+        {
+          "clipId": "clip-014",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 0,
+          "reason": "insufficient_tracked_poses"
+        },
+        {
+          "clipId": "clip-015",
+          "humanLabel": "forehand",
+          "expected": "forehand",
+          "predicted": "forehand",
+          "predictedPositives": [
+            "forehand"
+          ],
+          "correct": true,
+          "classifiedWindows": 91,
+          "reason": null
+        },
+        {
+          "clipId": "clip-016",
+          "humanLabel": "forehand",
+          "expected": "forehand",
+          "predicted": "forehand",
+          "predictedPositives": [
+            "forehand"
+          ],
+          "correct": true,
+          "classifiedWindows": 91,
+          "reason": null
+        },
+        {
+          "clipId": "clip-017",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 29,
+          "reason": null
+        },
+        {
+          "clipId": "clip-018",
+          "humanLabel": "backhand",
+          "expected": "backhand",
+          "predicted": "backhand",
+          "predictedPositives": [
+            "backhand"
+          ],
+          "correct": true,
+          "classifiedWindows": 91,
+          "reason": null
+        },
+        {
+          "clipId": "clip-019",
+          "humanLabel": "forehand",
+          "expected": "forehand",
+          "predicted": "forehand",
+          "predictedPositives": [
+            "forehand"
+          ],
+          "correct": true,
+          "classifiedWindows": 91,
+          "reason": null
+        },
+        {
+          "clipId": "clip-020",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 61,
+          "reason": null
+        },
+        {
+          "clipId": "clip-021",
+          "humanLabel": "no_shot",
+          "expected": "no_shot",
+          "predicted": "no_shot",
+          "predictedPositives": [],
+          "correct": true,
+          "classifiedWindows": 10,
+          "reason": null
+        }
+      ],
+      "mismatches": []
+    }
+  },
+  "resultHashes": {
+    "results/clip-001-baseline.json": "48937e47e83e1cdabb429b303e6c344d7e7a33f205b5a27aeb907a096b457082",
+    "results/clip-001-candidate.json": "92e783d587a46c3f1fd7c43c57a3c25be7546fcd1caa29283c95d6800d059394",
+    "results/clip-002-baseline.json": "0dddf3df0d455220a5ec5f72ed0f8cb15ae1b5d4505c4516927348e74e1115c9",
+    "results/clip-002-candidate.json": "fd0800eee404e1df790dd7686261a25a62eddd0c0758539e067dd36bf954ef56",
+    "results/clip-003-baseline.json": "24f958bbc7f9430747d95e078cb2716f67f8133d22287829ad72ca15981daeae",
+    "results/clip-003-candidate.json": "0d20c71ffb4ed266d8d1756074689ec1dfe539868b49ce1af8e6b447f9d0d731",
+    "results/clip-004-baseline.json": "7c887b09b0ba5236501c33003e9a8b33b8b7fc7bacd5c9d9b0c0ec298a491c05",
+    "results/clip-004-candidate.json": "31e7953579e985faedd90b064e022039db38211822b212603f8869cbf35773e8",
+    "results/clip-005-baseline.json": "f2e577afa27afa436de693b51291ece6e9368c6e5a071012fe0302e212df565f",
+    "results/clip-005-candidate.json": "e1c2d8a2a7ae2e4ed9651564ce21d1494e3b42589363ccefc227a5dc070de22d",
+    "results/clip-006-baseline.json": "6955db446ce8dde702af6b2f0f11130a7deeece9ed783b833e6114dc513ba7ec",
+    "results/clip-006-candidate.json": "6bfa63b2cf03f6f2a573e1a18cadeebba56887b2813442fb9d36d09f690746b8",
+    "results/clip-007-baseline.json": "d31bf47f5fc52b1d6f4170c4c757f70ebf6980a1250f0f042d21fc61be21146c",
+    "results/clip-007-candidate.json": "51e3f0ce2ae72c609d52733994d2d11da8688133137d923ca7d58f297705507b",
+    "results/clip-008-baseline.json": "816cf721112df222f9441ba45966de0e66411d79bad6a3b02dcbfe2d714beaf0",
+    "results/clip-008-candidate.json": "f787212cd1a43add1c4f75b9456820a0e8632c1af8b04e88becd43803e936791",
+    "results/clip-009-baseline.json": "66cf8907766b3a740825adfae5392d8e44dc480ccd8124c535e1257c74d4d5de",
+    "results/clip-009-candidate.json": "ef8a4416f66e344336b593585332443c5c205777a2072feeb03ba23980d55425",
+    "results/clip-010-baseline.json": "37965dee7471f0a3c7089b5bf10c0345688ac33323e93c3100d6fdc10471bc97",
+    "results/clip-010-candidate.json": "22008d025dea06456100b158c5cbf33cc6e41d3bb3a1e08b896f18a2c2048463",
+    "results/clip-012-baseline.json": "6f5f86a04b3908414bf7a7d1b79e9c2a1dff008853bf2b7226aaf5c70c3d7650",
+    "results/clip-012-candidate.json": "01e08ae4dc1c15287129fa46af25fc18049dac756232782263cf8666c2c409b5",
+    "results/clip-013-baseline.json": "ac6f846ffe398ebda0ca15dcbf9c2155efc52e659ee69da4249ec7b2355be10a",
+    "results/clip-013-candidate.json": "264bbc82b0aca58e775502c27f266833e7b9195bf88565909e109087841b5ad7",
+    "results/clip-014-baseline.json": "4e0ee8f22e4368a2a778b241725058dfb665a0e837314e5803fa11a72e0c9913",
+    "results/clip-014-candidate.json": "4fa0cca70d70cc73f7910c05ad9c74f9363a5ad30f7750e0d6312e177ed64a60",
+    "results/clip-015-baseline.json": "ee561ffd8585ca73428ecd92b32f3a5046424e0ce466830e239df7f5a57a15e7",
+    "results/clip-015-candidate.json": "20ff351de5e6af5a2e54eaa899b8ae6983a2fa0ac975d9921fb84852b404c0d8",
+    "results/clip-016-baseline.json": "e68598e054e6e03831928f3ac032a8fe9d7bbe06086cbc0c79a024f71d6692b4",
+    "results/clip-016-candidate.json": "fb3ab144d6f9be2f890e94757700425fbaabcd2377a1ee0e0cd9254880fdbee1",
+    "results/clip-017-baseline.json": "1164811a04ac5b85043693c9439d7ccccefbadadd8091a5f5f0bb6d9cf4a458e",
+    "results/clip-017-candidate.json": "39c71c8c74ae8707c0fec8edb9bb95a4e6031d439ec1bbf0c2428474d1a2c922",
+    "results/clip-018-baseline.json": "144a2e4ec93149db43bd5dfcb1691b17294ac948800a3d3284af22d009fe77bb",
+    "results/clip-018-candidate.json": "500a3276cc938c40462d84abfafbc9d64cb0e6a11004f3bf7c0c78e14512362d",
+    "results/clip-019-baseline.json": "d771fbb03c37c145bf92b51b04f3cd8ff6b2e8dd05e2e34543db53076ba118c0",
+    "results/clip-019-candidate.json": "c7c0d12c5032f66021bf4b1de89e6782ee917751cef30ee57469ce1c3a1d2a5e",
+    "results/clip-020-baseline.json": "b8db6287f54c187debcafeec696fdce97bb6cec3719d96f9613d1867ad934c3e",
+    "results/clip-020-candidate.json": "d13381da3835e885efaff43349bf7fa36e4f8b71297cc048d304734fd4294e3d",
+    "results/clip-021-baseline.json": "00c1fc7b97bbbd9eb5c3701aa6d75d41f464e5a80e81a75bc463b5241eaa3e31",
+    "results/clip-021-candidate.json": "c7e473f625061a3674b757f2360afbf0c229c2f9f770707cea5e81d9ae7d01dc",
+    "results/source-1-baseline.json": "06e9841c5f0292a7ff34d0db26bcc5ffe84ed226677396b9ba083f789e1754e0",
+    "results/source-1-candidate.json": "1194bd2e55865637a5da48d8153ac1f0303a0643b7fcaa813a007b900a72438f",
+    "results/source-2-baseline.json": "ffd8e6f8709b20804c8ee3b8becd8b170497a36b0f4838305e4b2424f6e4f06c",
+    "results/source-2-candidate.json": "486ae41ff7cd9c52208ab80dcf8ca08e20cda23234b7c72826f24f0dd2c427d8"
+  },
+  "totals": {
+    "pairs": 22,
+    "inputs": 12844,
+    "scoreWindows": 6801,
+    "events": 35
+  },
+  "limitations": [
+    "Starter corpus from two recordings, not general accuracy evidence.",
+    "No controlled timing benchmark in this run.",
+    "No broader browser, codec or resource coverage inferred."
+  ],
+  "evidenceDirectory": "/Users/lawrence/.codex/worktrees/tennis-sequential-decode/stroke-highlights/experiments/sequential-decode/promotion-20261116",
+  "lifecycle": {
+    "status": "passed",
+    "browser": "embedded Chromium",
+    "fixture": "clip-001",
+    "fallback": {
+      "freshWorkers": 2,
+      "allTerminated": true,
+      "events": [
+        "backhand"
+      ],
+      "reader": "Compatibility reader used for this video"
+    },
+    "cancellation": {
+      "propagated": true,
+      "restarted": false,
+      "workerTerminated": true
+    }
+  },
+  "authorization": "User requested fast experimental as the default and removal of the other mode on 2026-11-16.",
+  "promotionVerification": {
+    "inferenceSourceAndLockHashesMatch": true,
+    "unitTestsPassed": 14,
+    "productionBuild": "passed",
+    "diffWhitespaceCheck": "passed",
+    "mainAppSmoke": {
+      "url": "http://127.0.0.1:5174/",
+      "fixture": "clip-001.mp4",
+      "loadedThrough": "Test clips picker",
+      "reader": "Fast detection",
+      "result": "Compilations ready.",
+      "backhandEvents": 1,
+      "mp4DownloadAvailable": true
+    },
+    "existingUiAndTestClipChangesPreserved": true
+  }
+}

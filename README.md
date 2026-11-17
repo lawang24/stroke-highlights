@@ -5,6 +5,13 @@ Review tennis shots and create separate forehand/backhand MP4 compilations.
 Video processing stays on your device; videos, frames, poses, and shot lists are
 not uploaded.
 
+In `npm run dev`, **Test clips** beside Video opens a picker for the local
+recordings (`small-clip.mov`, `inputs/long-demo-last-5-minutes.mp4`, and
+`outputs/adaspot-comparison-input.mp4`) and the clips in
+`outputs/regression-review-v1/clips/`. Loading one replaces the current video and
+shot list. Missing files are omitted. The picker and clip endpoint are dev-only;
+recordings are never copied into the production build.
+
 The model choice, retired approaches, exact experiment settings, and measured
 results are recorded in [experiments/DECISIONS.md](experiments/DECISIONS.md).
 
@@ -45,6 +52,12 @@ Python server, GPU, credentials, or API key.
 Manual shot review and compilation also work without detection. Cancel stops the
 active worker and retains the video and existing shot list.
 
+Fast sequential decoding is the default, with no detection-mode selector. Videos
+outside the verified fast path automatically restart with the compatibility reader
+and fresh tracking state. Cancellation stops analysis without restarting it.
+The model, 30 Hz sample grid, thresholds and shot scoring are unchanged. See the
+[default-reader validation](experiments/2026-11-16-fast-default-report.json).
+
 The browser uses the same pinned MoveNet model, GRU weights, feature order,
 handedness transform, thresholds, and postprocessing as Python. The GRU arithmetic
 is tested against Keras reference probabilities. Browser/OpenCV video decoding
@@ -74,11 +87,29 @@ npm run preview
 ```
 
 Build output is `dist/`; never host the repository root or personal recordings.
+GitHub Pages is deployed by [the Pages workflow](.github/workflows/pages.yml).
+Every push to `main` installs locked dependencies, prepares the model/runtime,
+runs the JavaScript tests, builds the app, and deploys only `dist/` after success.
+Pull requests targeting `main` run the same tests and build without deploying.
+You can also rerun a deployment using **Actions → Test, build, and deploy Pages →
+Run workflow** on `main`. Pages settings must use **GitHub Actions** as the source;
+the old `gh-pages` branch is retained as a historical build and is no longer used.
+
 Relative asset paths support subdirectory hosting when the URL ends with `/`.
 Serve `.wasm` as `application/wasm`. No cross-origin isolation is required.
 The document has a restrictive CSP. TensorFlow Lite's Emscripten worker uses
 runtime-generated JS bindings; if your host applies CSP to worker responses,
 account for that requirement separately from the document policy.
+
+### Model attribution
+
+Shot recognition uses the pretrained Tennis RNN (GRU) model from
+[antoinekeller/tennis_shot_recognition — Tennis shot recognition with Dense NN and RNN](https://github.com/antoinekeller/tennis_shot_recognition).
+The pinned checkpoint is
+[`tennis_rnn.h5` at revision `6fdfd938f8d6893e2c926eb12fcc7f9bfc3e792f`](https://github.com/antoinekeller/tennis_shot_recognition/blob/6fdfd938f8d6893e2c926eb12fcc7f9bfc3e792f/tennis_rnn.h5).
+This project exports its numeric weights for browser inference and uses MoveNet
+Lightning for pose estimation. Credit for the pretrained shot classifier belongs
+to the upstream project; this app does not train a new classifier.
 
 The upstream Tennis RNN repository does not declare a license. Its weights are
 fetched locally rather than committed here; a browser build contains derived

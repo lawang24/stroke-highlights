@@ -22,7 +22,7 @@ const truth = scoredTruth(frozen);
 const clips = truth.map(row => frozen.manifest.clips.find(clip => clip.id === row.clip_id));
 if (!clips.length || clips.some(clip => !clip)) throw new Error('Missing scored clips');
 for (const clip of clips) if (sha(await readFile(resolve(dataset, clip.file))) !== clip.sha256) throw new Error(`Clip checksum mismatch: ${clip.id}`);
-const files = ['web/media.js', 'web/tennis.worker.js', 'web/tennis-rnn.js', 'package-lock.json',
+const files = ['web/media.js', 'web/sequential-decoder.js', 'web/tennis.worker.js', 'web/tennis-rnn.js', 'package-lock.json',
   'scripts/evaluate-browser.mjs', 'scripts/regression-metrics.mjs',
   'public/runtime/tennis-rnn/weights.json', 'public/runtime/tennis-rnn/movenet.tflite'];
 const hashes = Object.fromEntries(await Promise.all(files.map(async file => [file, sha(await readFile(resolve(root, file)))])));
