@@ -1,10 +1,56 @@
 // Numeric inference for the pinned Keras reset_after=True GRU. No retraining.
 export const CLASSES = ['backhand', 'forehand', 'neutral', 'serve'];
 export const JOINTS = [0, ...Array.from({length: 12}, (_, i) => i + 5)];
+export const ARM_JOINTS = [7, 8, 9, 10];
 const sigmoid = x => 1 / (1 + Math.exp(-x));
 
 export function poseFeatures(points, leftHanded = false) {
   return Float32Array.from(JOINTS.flatMap(i => [points[i * 3], leftHanded ? 1 - points[i * 3 + 1] : points[i * 3 + 1]]));
+}
+
+export function smoothArmOcclusions(pointsList, { minConf = .35, lowConf = .22, maxJump = .08, maxGap = 6 } = {}) {
+  const n = pointsList.length;
+  const out = pointsList.map(p => p ? Float32Array.from(p) : null);
+  if (n < 5) return out;
+  for (const joint of ARM_JOINTS) {
+    const base = joint * 3;
+    const bad = new Uint8Array(n);
+    const good = [];
+    for (let i = 0; i < n; i++) {
+      const p = out[i];
+      if (!p) continue;
+      const conf = p[base + 2];
+      let jump = 0;
+      if (i > 0 && out[i - 1]) jump = Math.max(jump, Math.hypot(p[base] - out[i - 1][base], p[base + 1] - out[i - 1][base + 1]));
+      if (i + 1 < n && out[i + 1]) jump = Math.max(jump, Math.hypot(p[base] - out[i + 1][base], p[base + 1] - out[i + 1][base + 1]));
+      if (conf < minConf && (conf < lowConf || jump > maxJump)) bad[i] = 1;
+      else good.push(i);
+    }
+    if (good.length < 2 || good.length === n) continue;
+    for (let i = 0; i < n; i++) {
+      if (!bad[i] || !out[i]) continue;
+      let left = -1, right = -1, minDist = Infinity;
+      for (const g of good) {
+        const d = Math.abs(g - i);
+        if (d < minDist) minDist = d;
+        if (g < i) left = g;
+        else if (g > i && right === -1) right = g;
+      }
+      if (minDist > maxGap) continue;
+      if (left !== -1 && right !== -1) {
+        const alpha = (i - left) / (right - left);
+        out[i][base] = out[left][base] + alpha * (out[right][base] - out[left][base]);
+        out[i][base + 1] = out[left][base + 1] + alpha * (out[right][base + 1] - out[left][base + 1]);
+      } else if (left !== -1) {
+        out[i][base] = out[left][base];
+        out[i][base + 1] = out[left][base + 1];
+      } else if (right !== -1) {
+        out[i][base] = out[right][base];
+        out[i][base + 1] = out[right][base + 1];
+      }
+    }
+  }
+  return out;
 }
 
 export function classifyWindow(sequence, weights) {
@@ -81,17 +127,18 @@ export function suppressPostBackhandRecovery(samples, { bhTrigger = .35, neutral
   });
 }
 
-export function decodeScores(samples, duration, { threshold = .98, minGap = 2, before = 1.2, after = .9, sustainedMinFrames = 8, sustainedThreshold = .80 } = {}) {
+export function decodeScores(samples, duration, { threshold = .98, minGap = 2, before = 1.2, after = .9, sustainedMinFrames = 8, sustainedThreshold = .80, runFloor = .50 } = {}) {
   const cleaned = suppressPostBackhandRecovery(samples);
-  const effGate = Math.min(threshold, sustainedThreshold);
+  const effPeak = Math.min(threshold, sustainedThreshold);
+  const effFloor = Math.min(effPeak, runFloor);
   const candidates = []; let run = null, runLength = 0, previous = null;
   const finish = () => {
-    if (run && (run.score > threshold || (runLength >= sustainedMinFrames && run.score > effGate))) candidates.push(run);
+    if (run && (run.score > threshold || (runLength >= sustainedMinFrames && run.score > effPeak))) candidates.push(run);
     run = null; runLength = 0;
   };
   for (const {time, scores} of cleaned) {
     const score = Math.max(...scores), label = scores.indexOf(score);
-    if (label === 2 || score <= effGate) { finish(); previous = null; continue; }
+    if (label === 2 || score <= effFloor) { finish(); previous = null; continue; }
     if (run && (run.label !== label || time - previous > 1.5/30)) finish();
     runLength += 1;
     if (!run || score > run.score) run = {time, label, score};

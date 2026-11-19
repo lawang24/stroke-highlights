@@ -21,6 +21,7 @@ WINDOW = 30
 FPS = 30.0
 SUSTAINED_MIN_FRAMES = 8
 SUSTAINED_THRESHOLD = 0.80
+RUN_FLOOR = 0.50
 
 
 def pose_features(points, left_handed=False):
@@ -261,7 +262,8 @@ def collect_scores(source, metadata, args, cache):
 
 
 def decode_scores(times, scores, duration, threshold=.98, min_gap=2.0, before=1.2, after=.9,
-                  sustained_min_frames=SUSTAINED_MIN_FRAMES, sustained_threshold=SUSTAINED_THRESHOLD):
+                  sustained_min_frames=SUSTAINED_MIN_FRAMES, sustained_threshold=SUSTAINED_THRESHOLD,
+                  run_floor=RUN_FLOOR):
     """One peak per confident class run (or sustained multi-frame run), followed by cross-class suppression."""
     if not 0 < threshold <= 1 or not math.isfinite(min_gap) or min_gap <= 0:
         raise ValueError("Invalid Tennis RNN threshold or minimum gap")
@@ -269,18 +271,19 @@ def decode_scores(times, scores, duration, threshold=.98, min_gap=2.0, before=1.
     if scores.shape != (len(times), 4) or not np.isfinite(scores).all():
         raise ValueError("Expected four finite probabilities per Tennis RNN window")
     scores = suppress_post_backhand_recovery(times, scores)
-    eff_gate = min(threshold, sustained_threshold)
+    eff_peak = min(threshold, sustained_threshold)
+    eff_floor = min(eff_peak, run_floor)
     candidates, run = [], []
     def finish():
         if run:
             peak = max(run, key=lambda p: p[2])
-            if peak[2] > threshold or (len(run) >= sustained_min_frames and peak[2] > eff_gate):
+            if peak[2] > threshold or (len(run) >= sustained_min_frames and peak[2] > eff_peak):
                 candidates.append(peak)
             run.clear()
     for t, probabilities in zip(times, scores):
         label = int(np.argmax(probabilities))
         confidence = float(probabilities[label])
-        if label == 2 or confidence <= eff_gate:
+        if label == 2 or confidence <= eff_floor:
             finish()
             continue
         if run and (label != run[-1][1] or t - run[-1][0] > 1.5/FPS):

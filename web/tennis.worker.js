@@ -2,9 +2,9 @@ import '@tensorflow/tfjs-backend-cpu';
 import * as tf from '@tensorflow/tfjs-core';
 // The published package's unbundled entry omits its WASM client; use its ESM bundle.
 import {loadTFLiteModel, setWasmPath} from '@tensorflow/tfjs-tflite/dist/tf-tflite.fesm.js';
-import {classifyWindow, poseFeatures, trackPose} from './tennis-rnn.js';
+import {classifyWindow, poseFeatures, smoothArmOcclusions, trackPose} from './tennis-rnn.js';
 
-let model, weights, options, canvas, crop = null, sequence = [];
+let model, weights, options, canvas, crop = null, sequence = [], lastPrediction = null;
 self.onmessage = async ({data}) => {
   try {
     if (data.type === 'init') {
@@ -14,6 +14,7 @@ self.onmessage = async ({data}) => {
       if (!response.ok) throw new Error('Tennis RNN weights are missing. Run npm run setup.');
       const payload = await response.json(); weights = payload.weights; options = data.options;
       model = await loadTFLiteModel(`${data.base}runtime/tennis-rnn/movenet.tflite`, {numThreads: 1});
+      crop = null; sequence = []; lastPrediction = null;
       self.postMessage({type: 'ready'});
     } else if (data.type === 'frame') {
       const {bitmap, time} = data;
@@ -39,16 +40,38 @@ self.onmessage = async ({data}) => {
         });
         const tracked = trackPose(points, crop, width, height); crop = tracked.crop;
         let prediction = null;
-        if (!tracked.valid) sequence = [];
+        if (!tracked.valid) { sequence = []; lastPrediction = null; }
         else {
-          sequence.push({time, features: poseFeatures(points, options.handedness === 'left')});
+          const leftHanded = options.handedness === 'left';
+          sequence.push({time, points, features: poseFeatures(points, leftHanded)});
           if (sequence.length === 30) {
-            prediction = {time: (sequence[0].time + time)/2, scores: classifyWindow(sequence.map(s => s.features), weights)};
+            const smoothed = smoothArmOcclusions(sequence.map(s => s.points));
+            const feats = smoothed.map(p => poseFeatures(p, leftHanded));
+            prediction = {time: (sequence[0].time + time)/2, scores: classifyWindow(feats, weights)};
+            lastPrediction = prediction;
             sequence.shift();
           }
         }
         self.postMessage({type: 'prediction', prediction});
       } finally { bitmap.close(); }
+    } else if (data.type === 'flush') {
+      const predictions = [];
+      // Complete trailing 30-frame windows if a stroke is active at the clip boundary.
+      if (sequence.length === 29 && lastPrediction && Math.max(lastPrediction.scores[0], lastPrediction.scores[1]) >= .15) {
+        const leftHanded = options.handedness === 'left';
+        const tail = sequence.slice();
+        const last = tail[tail.length - 1];
+        for (let k = 1; k <= 15; k++) {
+          const t = last.time + k / 30;
+          tail.push({time: t, points: last.points, features: last.features});
+          const windowSeq = tail.slice(tail.length - 30);
+          const smoothed = smoothArmOcclusions(windowSeq.map(s => s.points));
+          const feats = smoothed.map(p => poseFeatures(p, leftHanded));
+          const center = Math.min(data.duration ?? t, (windowSeq[0].time + t) / 2);
+          predictions.push({time: center, scores: classifyWindow(feats, weights)});
+        }
+      }
+      self.postMessage({type: 'flushed', predictions});
     }
   } catch (error) { console.error(error); self.postMessage({type: 'error', message: error.message || String(error)}); }
 };

@@ -99,6 +99,8 @@ async function analyzeAttempt(url, options, signal, progress, blob) {
       if (prediction) samples.push(prediction);
       if (i % 5 === 0 || i === count - 1) progress(`Tennis RNN · ${Math.round(time)} of ${Math.round(video.duration)} seconds analyzed`, (i + 1) / count * 100);
     }
+    const { predictions: tail } = await ask({ type: 'flush', duration: video.duration });
+    if (tail?.length) samples.push(...tail);
     return decodeScores(samples, video.duration, options);
   } finally {
     await source?.close();
