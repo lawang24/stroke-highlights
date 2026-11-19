@@ -5,6 +5,7 @@ import csv
 import math
 import shutil
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -81,8 +82,13 @@ def compilation_ranges(events, stroke):
     return merged
 
 
+def find_ffmpeg():
+    return shutil.which("ffmpeg") or shutil.which("ffmpeg", path=str(Path(sys.executable).parent))
+
+
 def run_ffmpeg(arguments):
-    result = subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin", *arguments],
+    ffmpeg_bin = find_ffmpeg() or "ffmpeg"
+    result = subprocess.run([ffmpeg_bin, "-hide_banner", "-loglevel", "error", "-nostdin", *arguments],
                             capture_output=True, text=True)
     if result.returncode:
         raise RuntimeError(f"FFmpeg failed: {result.stderr.strip()}")
@@ -165,7 +171,7 @@ def main(argv=None):
     try:
         source = args.input.resolve()
         metadata = probe_video(source)
-        if not args.analyze_only and not shutil.which("ffmpeg"):
+        if not args.analyze_only and not find_ffmpeg():
             raise ValueError("FFmpeg is required for export. Install it (macOS: brew install ffmpeg).")
         args.output_dir.mkdir(parents=True, exist_ok=True)
         labels = ["forehand", "backhand"] if args.stroke == "both" else [args.stroke]

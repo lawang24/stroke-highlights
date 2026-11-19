@@ -15,9 +15,12 @@ import numpy as np
 from scripts.setup_tennis_rnn import ROOT, ARTIFACTS, verify_models
 
 JOINTS = [0, *range(5, 17)]
+ARM_JOINTS = (7, 8, 9, 10)
 CLASSES = ("backhand", "forehand", "neutral", "serve")
 WINDOW = 30
 FPS = 30.0
+SUSTAINED_MIN_FRAMES = 8
+SUSTAINED_THRESHOLD = 0.80
 
 
 def pose_features(points, left_handed=False):
@@ -26,6 +29,94 @@ def pose_features(points, left_handed=False):
     if left_handed:
         features[:, 1] = 1 - features[:, 1]
     return features.reshape(26)
+
+
+def smooth_arm_occlusions(points_list, valid_list, min_conf=0.35, low_conf=0.22, max_jump=0.08, max_gap=6):
+    """Interpolate occluded elbow/wrist keypoints across short self-occlusion bursts."""
+    n = len(points_list)
+    out = [np.asarray(p, dtype=np.float32).copy() if p is not None else None for p in points_list]
+    i = 0
+    while i < n:
+        if not valid_list[i] or out[i] is None:
+            i += 1
+            continue
+        j = i
+        while j < n and valid_list[j] and out[j] is not None:
+            j += 1
+        seg_len = j - i
+        if seg_len >= 5:
+            seg = np.stack(out[i:j])
+            idx = np.arange(seg_len)
+            for joint in ARM_JOINTS:
+                confs = seg[:, joint, 2]
+                xy = seg[:, joint, :2]
+                jump = np.zeros(seg_len, dtype=np.float32)
+                jump[1:] = np.maximum(jump[1:], np.linalg.norm(xy[1:] - xy[:-1], axis=1))
+                jump[:-1] = np.maximum(jump[:-1], np.linalg.norm(xy[:-1] - xy[1:], axis=1))
+                bad = (confs < min_conf) & ((confs < low_conf) | (jump > max_jump))
+                good = np.where(~bad)[0]
+                if 2 <= len(good) < seg_len:
+                    dist = np.min(np.abs(idx[:, None] - good[None, :]), axis=1)
+                    mask = bad & (dist <= max_gap)
+                    if mask.any():
+                        for coord in (0, 1):
+                            seg[mask, joint, coord] = np.interp(idx, good, seg[good, joint, coord])[mask]
+            for k in range(seg_len):
+                out[i + k] = seg[k]
+        i = j
+    return out
+
+
+def suppress_post_backhand_recovery(times, scores, bh_trigger=0.35, neutral_reset=0.75,
+                                    reset_frames=4, max_recovery_sec=1.5):
+    """Reclassify post-backhand return-to-ready-position forehand spikes as neutral.
+
+    After finishing a backhand follow-through (hands on the dominant side), returning
+    the racquet to the center ready position moves the wrists in the forehand direction.
+    Until neutral ready position is re-established (>= reset_frames consecutive windows
+    with neutral >= neutral_reset, or max_recovery_sec elapsed), fold spurious forehand
+    probability into neutral.
+    """
+    times = np.asarray(times, dtype=np.float64)
+    out = np.asarray(scores, dtype=np.float32).copy()
+    if len(times) == 0:
+        return out
+    in_bh_recovery = False
+    last_bh_time = -1e9
+    neutral_streak = 0
+    prev_t = None
+    for i, (t, row) in enumerate(zip(times, out)):
+        if prev_t is not None and t - prev_t > 0.25:
+            in_bh_recovery = False
+            neutral_streak = 0
+        prev_t = float(t)
+        bh, fh, ne, _ = float(row[0]), float(row[1]), float(row[2]), float(row[3])
+        label = int(np.argmax(row))
+        if label == 0 and bh >= bh_trigger:
+            in_bh_recovery = True
+            last_bh_time = float(t)
+            neutral_streak = 0
+            if fh > 0.0:
+                out[i, 2] = ne + fh
+                out[i, 1] = 0.0
+            continue
+        if in_bh_recovery:
+            if float(t) - last_bh_time > max_recovery_sec:
+                in_bh_recovery = False
+                neutral_streak = 0
+                continue
+            if ne >= neutral_reset and label == 2:
+                neutral_streak += 1
+                if neutral_streak >= reset_frames:
+                    in_bh_recovery = False
+                    neutral_streak = 0
+                    continue
+            else:
+                neutral_streak = 0
+            if fh > 0.0:
+                out[i, 2] = ne + fh
+                out[i, 1] = 0.0
+    return out
 
 
 def load_classifier(tf):
@@ -105,7 +196,7 @@ def iter_samples(source, metadata, duration):
 
 def collect_scores(source, metadata, args, cache):
     duration = min(metadata["duration"], args.limit) if args.limit else metadata["duration"]
-    identity = {"version": 1, "source": str(source), "size": source.stat().st_size,
+    identity = {"version": 3, "source": str(source), "size": source.stat().st_size,
                 "mtime_ns": source.stat().st_mtime_ns, "duration": duration,
                 "fps": metadata["fps"], "mirrored": args.mirrored,
                 "handedness": args.handedness, "player": args.player,
@@ -125,16 +216,30 @@ def collect_scores(source, metadata, args, cache):
     # Keep this small optional model on CPU; do not compete with the video UI.
     tf.config.set_visible_devices([], "GPU")
     tracker = MoveNetTracker(tf, args.min_player_height)
-    features, valid, times = [], [], []
+    raw_points, valid, times = [], [], []
     for t, frame in iter_samples(source, metadata, duration):
         if args.mirrored:
             frame = cv2.flip(frame, 1)
         points = tracker.extract(frame)
+        raw_points.append(points)
         valid.append(points is not None)
-        features.append(pose_features(points, args.handedness == "left") if points is not None else np.zeros(26))
         times.append(t)
         if len(times) % 300 == 0:
             print(f"Tennis RNN pose extraction: {t:.1f} / {duration:.1f} seconds", flush=True)
+    raw_valid_count = sum(valid)
+    total_frames = len(valid)
+    smoothed_points = smooth_arm_occlusions(raw_points, valid)
+    left_handed = args.handedness == "left"
+    features = [pose_features(p, left_handed) if p is not None else np.zeros(26, dtype=np.float32)
+                for p in smoothed_points]
+    # Complete trailing 30-frame windows at the clip boundary so strokes in the
+    # final 0.5s are not cut off mid-swing before follow-through frames arrive.
+    if len(features) >= WINDOW and all(valid[-WINDOW:]):
+        tail_pad = WINDOW // 2
+        for _ in range(tail_pad):
+            features.append(features[-1].copy())
+            valid.append(True)
+            times.append(times[-1] + 1.0 / FPS)
     model = load_classifier(tf)
     features = np.asarray(features, dtype=np.float32)
     times = np.asarray(times)
@@ -146,30 +251,36 @@ def collect_scores(source, metadata, args, cache):
         batch_starts = starts[offset:offset+128]
         batch = np.stack([features[i:i+WINDOW] for i in batch_starts])
         scores.extend(predict(batch).numpy())
-        centers.extend((times[i] + times[i+WINDOW-1]) / 2 for i in batch_starts)
+        centers.extend(min(duration, (times[i] + times[i+WINDOW-1]) / 2) for i in batch_starts)
     scores = np.asarray(scores, dtype=np.float32).reshape(-1, 4)
     centers = np.asarray(centers)
+    scores = suppress_post_backhand_recovery(centers, scores)
     np.savez_compressed(cache, identity=json.dumps(identity), times=centers, scores=scores)
-    print(f"Tennis RNN: {sum(valid)}/{len(valid)} valid poses, {len(centers)} classified windows", flush=True)
+    print(f"Tennis RNN: {raw_valid_count}/{total_frames} valid poses, {len(centers)} classified windows", flush=True)
     return centers, scores
 
 
-def decode_scores(times, scores, duration, threshold=.98, min_gap=2.0, before=1.2, after=.9):
-    """One peak per confident class run, followed by cross-class suppression."""
+def decode_scores(times, scores, duration, threshold=.98, min_gap=2.0, before=1.2, after=.9,
+                  sustained_min_frames=SUSTAINED_MIN_FRAMES, sustained_threshold=SUSTAINED_THRESHOLD):
+    """One peak per confident class run (or sustained multi-frame run), followed by cross-class suppression."""
     if not 0 < threshold <= 1 or not math.isfinite(min_gap) or min_gap <= 0:
         raise ValueError("Invalid Tennis RNN threshold or minimum gap")
     times, scores = np.asarray(times), np.asarray(scores)
     if scores.shape != (len(times), 4) or not np.isfinite(scores).all():
         raise ValueError("Expected four finite probabilities per Tennis RNN window")
+    scores = suppress_post_backhand_recovery(times, scores)
+    eff_gate = min(threshold, sustained_threshold)
     candidates, run = [], []
     def finish():
         if run:
-            candidates.append(max(run, key=lambda p: p[2]))
+            peak = max(run, key=lambda p: p[2])
+            if peak[2] > threshold or (len(run) >= sustained_min_frames and peak[2] > eff_gate):
+                candidates.append(peak)
             run.clear()
     for t, probabilities in zip(times, scores):
         label = int(np.argmax(probabilities))
         confidence = float(probabilities[label])
-        if label == 2 or confidence <= threshold:
+        if label == 2 or confidence <= eff_gate:
             finish()
             continue
         if run and (label != run[-1][1] or t - run[-1][0] > 1.5/FPS):

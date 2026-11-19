@@ -56,13 +56,44 @@ export function trackPose(points, crop, width, height, minHeight = .2) {
   return { valid: true, crop: [clamp((highs[1]+lows[1]-side)/2, width-side), clamp((highs[0]+lows[0]-side)/2, height-side), side, side] };
 }
 
-export function decodeScores(samples, duration, { threshold = .98, minGap = 2, before = 1.2, after = .9 } = {}) {
-  const candidates = []; let run = null, previous = null;
-  const finish = () => { if (run) candidates.push(run); run = null; };
-  for (const {time, scores} of samples) {
+export function suppressPostBackhandRecovery(samples, { bhTrigger = .35, neutralReset = .75, resetFrames = 4, maxRecoverySec = 1.5 } = {}) {
+  let inBhRecovery = false, lastBhTime = -Infinity, neutralStreak = 0, prevTime = null;
+  return samples.map(({ time, scores }) => {
+    if (prevTime !== null && time - prevTime > .25) { inBhRecovery = false; neutralStreak = 0; }
+    prevTime = time;
+    const [bh, fh, ne, sv] = scores;
+    const label = scores.indexOf(Math.max(...scores));
+    if (label === 0 && bh >= bhTrigger) {
+      inBhRecovery = true; lastBhTime = time; neutralStreak = 0;
+      return fh > 0 ? { time, scores: [bh, 0, ne + fh, sv] } : { time, scores };
+    }
+    if (inBhRecovery) {
+      if (time - lastBhTime > maxRecoverySec) { inBhRecovery = false; neutralStreak = 0; return { time, scores }; }
+      if (ne >= neutralReset && label === 2) {
+        neutralStreak += 1;
+        if (neutralStreak >= resetFrames) { inBhRecovery = false; neutralStreak = 0; return { time, scores }; }
+      } else {
+        neutralStreak = 0;
+      }
+      if (fh > 0) return { time, scores: [bh, 0, ne + fh, sv] };
+    }
+    return { time, scores };
+  });
+}
+
+export function decodeScores(samples, duration, { threshold = .98, minGap = 2, before = 1.2, after = .9, sustainedMinFrames = 8, sustainedThreshold = .80 } = {}) {
+  const cleaned = suppressPostBackhandRecovery(samples);
+  const effGate = Math.min(threshold, sustainedThreshold);
+  const candidates = []; let run = null, runLength = 0, previous = null;
+  const finish = () => {
+    if (run && (run.score > threshold || (runLength >= sustainedMinFrames && run.score > effGate))) candidates.push(run);
+    run = null; runLength = 0;
+  };
+  for (const {time, scores} of cleaned) {
     const score = Math.max(...scores), label = scores.indexOf(score);
-    if (label === 2 || score <= threshold) { finish(); previous = null; continue; }
+    if (label === 2 || score <= effGate) { finish(); previous = null; continue; }
     if (run && (run.label !== label || time - previous > 1.5/30)) finish();
+    runLength += 1;
     if (!run || score > run.score) run = {time, label, score};
     previous = time;
   }

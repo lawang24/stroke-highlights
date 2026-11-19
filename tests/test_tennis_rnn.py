@@ -10,7 +10,14 @@ from unittest.mock import patch
 import numpy as np
 
 from stroke_highlights import main, parse_args
-from tennis_rnn_backend import pose_features, decode_scores, iter_samples, collect_scores
+from tennis_rnn_backend import (
+    pose_features,
+    decode_scores,
+    iter_samples,
+    collect_scores,
+    smooth_arm_occlusions,
+    suppress_post_backhand_recovery,
+)
 
 
 class TennisRNNTests(unittest.TestCase):
@@ -73,9 +80,7 @@ class TennisRNNTests(unittest.TestCase):
             event = dict(id=1, time=1, start=0, end=2, stroke='forehand', score=.999, include=True, reason='test')
             argv = [str(source), '--output-dir', str(output), '--analyze-only']
             self.assertEqual(parse_args(argv).classifier, 'tennis-rnn')
-            with patch('stroke_highlights.probe_video', return_value={'duration': 4, 'height': 1080}), \
-                    patch('tennis_rnn_backend.analyze_tennis_rnn', return_value=[event]) as rnn, \
-                    contextlib.redirect_stdout(io.StringIO()):
+            with patch('stroke_highlights.probe_video', return_value={'duration': 4, 'height': 1080}),                     patch('tennis_rnn_backend.analyze_tennis_rnn', return_value=[event]) as rnn,                     contextlib.redirect_stdout(io.StringIO()):
                 main(argv)
                 review = json.loads((output / 'stroke-review.json').read_text())
                 self.assertEqual(review['classifier'], 'tennis-rnn')
@@ -87,6 +92,43 @@ class TennisRNNTests(unittest.TestCase):
         base = ['video.mp4', '--output-dir', 'test', '--classifier', 'tennis-rnn']
         for extra in (['--player', 'far'], ['--tennis-rnn-threshold', '1.1'], ['--tennis-rnn-min-gap', '0'], ['--classifier', 'heuristic'], ['--classifier', 'adaspot'], ['--classifier', 'compare']):
             with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit): parse_args(base + extra)
+
+    def test_sustained_backhand_run_and_arm_occlusion_smoothing(self):
+        times = np.arange(15) / 30 + 1.0
+        scores = np.array([[.88, .01, .10, .01]] * 9 + [[.01, .01, .97, .01]] * 4 + [[.88, .01, .10, .01]] * 2)
+        events = decode_scores(times, scores, 5.0, min_gap=0.5)
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0]['stroke'], 'backhand')
+
+        base_pose = np.ones((17, 3), dtype=np.float32) * 0.5
+        seq = [base_pose.copy() for _ in range(7)]
+        for idx, val in enumerate(np.linspace(0.2, 0.8, 7)):
+            seq[idx][9, 0] = val
+            seq[idx][9, 2] = 0.8
+        seq[3][9, 0] = 0.95
+        seq[3][9, 2] = 0.15
+        smoothed = smooth_arm_occlusions(seq, [True] * 7)
+        self.assertAlmostEqual(float(smoothed[3][9, 0]), 0.5, places=4)
+
+    def test_post_backhand_ready_position_recovery_is_reclassified_as_neutral(self):
+        # Backhand (9 frames @ 0.88) followed directly by ready-position recovery (10 frames of fake forehand @ 0.95)
+        # without an intervening >=4-frame neutral reset, then 5 neutral frames, then a real forehand.
+        times = np.arange(34) / 30 + 1.0
+        scores = np.array(
+            [[.88, .02, .09, .01]] * 9 +      # True backhand
+            [[.05, .92, .02, .01]] * 10 +     # Post-backhand recovery into ready position (spurious FH)
+            [[.01, .01, .97, .01]] * 5 +      # Stable neutral ready state (>= 4 frames)
+            [[.01, .99, .00, .00]] * 10       # Subsequent real forehand
+        )
+        cleaned = suppress_post_backhand_recovery(times, scores)
+        # Spurious forehand during frames 9..18 is folded into neutral (class 2)
+        self.assertTrue(np.all(np.argmax(cleaned[9:19], axis=1) == 2))
+        self.assertTrue(np.allclose(cleaned[9:19, 1], 0.0))
+        # Even with a very small min_gap (0.1s), only the true backhand and real forehand are emitted
+        events = decode_scores(times, scores, 5.0, min_gap=0.1)
+        self.assertEqual([e['stroke'] for e in events], ['backhand', 'forehand'])
+        self.assertAlmostEqual(events[0]['time'], 1.0, places=2)
+        self.assertGreater(events[1]['time'], 1.7)
 
 
 if __name__ == '__main__': unittest.main()
